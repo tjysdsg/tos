@@ -1,0 +1,7 @@
+*.o
+*.tmp
+*.log
+toolchain/src/binutils  
+toolchain/src/build  
+toolchain/src/gcc  
+toolchain/src/gdb
