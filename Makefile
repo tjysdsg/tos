@@ -1,5 +1,5 @@
-C_SOURCES = $(wildcard kernel/*.c drivers/*.c)
-HEADERS = $(wildcard kernel/*.h drivers/*.h)
+C_SOURCES = $(wildcard kernel/*.c drivers/*.c )
+HEADERS = $(wildcard kernel/*.h drivers/*.h common/*.h)
 OBJ = ${C_SOURCES:.c=.o}
 
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
