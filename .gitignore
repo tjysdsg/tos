@@ -5,3 +5,7 @@ toolchain/src/binutils
 toolchain/src/build  
 toolchain/src/gcc  
 toolchain/src/gdb
+*build*/
+CMakeLists.txt
+.idea/
+.vscode/
