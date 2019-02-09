@@ -2,8 +2,9 @@
 *.tmp
 *.log
 *.bin
-toolchain/src/binutils  
-toolchain/src/build  
-toolchain/src/gcc  
-toolchain/src/gdb
+toolchain/share/ 
+toolchain/src/binutils/
+toolchain/src/build/
+toolchain/src/gcc/
+toolchain/src/gdb/
 *build*/
