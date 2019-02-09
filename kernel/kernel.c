@@ -1,18 +1,12 @@
+#include "../cpu/isr.h"
 #include "../drivers/screen.h"
 #include "util.h"
 
 void main() {
     clear_screen();
 
-    /* Fill up the screen */
-    int i = 0;
-    for (i = 0; i < 24; i++) {
-        char str[255];
-        int_to_ascii(i, str);
-        kprint_at(str, 0, i);
-    }
-    kprint_at("This text forces the kernel to scroll. Row 0 will disappear. ",
-              60, 24);
-    kprint_at("This text forces the kernel to scroll. Row 0 will disappear. ",
-              0, 24);
+    isr_install();
+    /* Test the interrupts */
+    __asm__ __volatile__("int $0");
+    __asm__ __volatile__("int $3");
 }
