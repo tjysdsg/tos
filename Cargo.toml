@@ -1,0 +1,20 @@
+[package]
+name = "tos"
+version = "0.1.0"
+authors = ["tjysdsg <tjy1018543509@163.com>"]
+edition = "2018"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+
+[dependencies]
+bootloader = "0.9.0"
+volatile = "0.2.6"
+spin = "0.5.2"
+
+[dependencies.lazy_static]
+version = "1.4.0"
+features = ["spin_no_std"]
