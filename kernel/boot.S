@@ -53,6 +53,11 @@ multiboot_header:
         .long TERM_LINES    # height
         .long 0             # depth
 
+        # .long 0     # graphics mode type. 0 for linear graphics mode, 1 for EGA-standard text mode.
+        # .long 1024  # width
+        # .long 768   # height
+        # .long 32    # depth
+
 multiboot_entry:
         // Initialize the stack pointer
         movl $(stack + STACK_SIZE), %esp

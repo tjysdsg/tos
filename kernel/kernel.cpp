@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "multiboot.h"
+#include "FrameBuffer.h"
 
 // check if the bit BIT in FLAGS is set
 #define CHECK_FLAG(flags, bit)   ((flags) & (1 << (bit)))
@@ -161,6 +162,16 @@ extern "C" void kmain(unsigned long magic, unsigned long addr) {
 
   // set mbi to the address of the Multiboot information structure
   mbi = (multiboot_info_t *) addr;
+
+  // TODO: implement font drawing using VBE
+  //  init_vbe(mbi);
+  //  FrameBuffer fb(mbi->framebuffer_type,
+  //                 mbi->framebuffer_bpp,
+  //                 mbi->framebuffer_pitch,
+  //                 reinterpret_cast<uint8_t *>(mbi->framebuffer_addr));
+  //  for (int i = 0; i < 500; ++i) {
+  //    fb.put_pixel(i, i);
+  //  }
 
   /// 2. Print mbi
   kprintf("flags = 0x%x\n", (unsigned) mbi->flags);

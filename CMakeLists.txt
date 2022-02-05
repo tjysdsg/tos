@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
-project(tos CXX ASM)
+project(tos C CXX ASM)
 
 add_library(boot OBJECT kernel/boot.S)
 
-add_library(kernel OBJECT kernel/kernel.cpp)
+add_library(kernel OBJECT kernel/kernel.cpp kernel/FrameBufferFontWriter.cpp kernel/FrameBuffer.cpp)
 target_compile_options(kernel PRIVATE -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti)
 
 # generate multiboot-compliant kernel file
@@ -23,6 +23,8 @@ add_custom_command(
         COMMAND grub-mkrescue -o ${ISO_PATH} ${ISO_TMP_DIR}
 
         DEPENDS boot kernel ${PROJECT_SOURCE_DIR}/kernel/linker.ld ${PROJECT_SOURCE_DIR}/kernel/grub.cfg $<TARGET_OBJECTS:boot> $<TARGET_OBJECTS:kernel>
+
+        COMMAND_EXPAND_LISTS
 )
 add_custom_target(multiboot ALL DEPENDS ${MULTIBOOT_OUTPUT_PATH})
 
