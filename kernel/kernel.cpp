@@ -1,119 +1,243 @@
 #include <stddef.h>
 #include <stdint.h>
+#include "multiboot.h"
 
-#if defined(__linux__)
-#error "You are not using a cross-compiler"
-#endif
+// check if the bit BIT in FLAGS is set
+#define CHECK_FLAG(flags, bit)   ((flags) & (1 << (bit)))
 
-#if !defined(__i386__)
-#error "This tutorial needs to be compiled with a ix86-elf compiler"
-#endif
+// attribute of an character
+#define ATTRIBUTE               7
+// video memory address
+#define VIDEO                   0xB8000
 
-/* Hardware text mode color constants. */
-enum vga_color {
-  VGA_COLOR_BLACK = 0,
-  VGA_COLOR_BLUE = 1,
-  VGA_COLOR_GREEN = 2,
-  VGA_COLOR_CYAN = 3,
-  VGA_COLOR_RED = 4,
-  VGA_COLOR_MAGENTA = 5,
-  VGA_COLOR_BROWN = 6,
-  VGA_COLOR_LIGHT_GREY = 7,
-  VGA_COLOR_DARK_GREY = 8,
-  VGA_COLOR_LIGHT_BLUE = 9,
-  VGA_COLOR_LIGHT_GREEN = 10,
-  VGA_COLOR_LIGHT_CYAN = 11,
-  VGA_COLOR_LIGHT_RED = 12,
-  VGA_COLOR_LIGHT_MAGENTA = 13,
-  VGA_COLOR_LIGHT_BROWN = 14,
-  VGA_COLOR_WHITE = 15,
-};
+static int xpos;
+static int ypos;
+static volatile uint8_t *video; /// video memory
 
-static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) {
-  return fg | bg << 4;
+/// Clear the screen and initialize VIDEO, XPOS and YPOS
+static void clear_screen() {
+  int i;
+
+  video = (unsigned char *) VIDEO;
+
+  for (i = 0; i < TERM_COLUMNS * TERM_LINES * 2; i++)
+    *(video + i) = 0;
+
+  xpos = 0;
+  ypos = 0;
 }
 
-static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
-  return (uint16_t) uc | (uint16_t) color << 8;
+/**
+ * Convert the integer D to a string and save the string in BUF. If
+ * BASE is equal to ’d’, interpret that D is decimal, and if BASE is
+ * equal to ’x’, interpret that D is hexadecimal
+ */
+static void itoa(char *buf, int base, int d) {
+  char *p = buf;
+  char *p1, *p2;
+  unsigned long ud = d;
+  int divisor = 10;
+
+  /* If %d is specified and D is minus, put ‘-’ in the head. */
+  if (base == 'd' && d < 0) {
+    *p++ = '-';
+    buf++;
+    ud = -d;
+  } else if (base == 'x')
+    divisor = 16;
+
+  /* Divide UD by DIVISOR until UD == 0. */
+  do {
+    int remainder = ud % divisor;
+
+    *p++ = (remainder < 10) ? remainder + '0' : remainder + 'a' - 10;
+  } while (ud /= divisor);
+
+  /* Terminate BUF. */
+  *p = 0;
+
+  /* Reverse BUF. */
+  p1 = buf;
+  p2 = p - 1;
+  while (p1 < p2) {
+    char tmp = *p1;
+    *p1 = *p2;
+    *p2 = tmp;
+    p1++;
+    p2--;
+  }
 }
 
-size_t strlen(const char *str) {
-  size_t len = 0;
-  while (str[len])
-    len++;
-  return len;
+static void putchar(int c) {
+  if (c == '\n' || c == '\r') {
+    newline:
+    xpos = 0;
+    ypos++;
+    if (ypos >= TERM_LINES)
+      ypos = 0;
+    return;
+  }
+
+  *(video + (xpos + ypos * TERM_COLUMNS) * 2) = c & 0xFF;
+  *(video + (xpos + ypos * TERM_COLUMNS) * 2 + 1) = ATTRIBUTE;
+
+  xpos++;
+  if (xpos >= TERM_COLUMNS)
+    goto newline;
 }
 
-static const size_t VGA_WIDTH = 80;
-static const size_t VGA_HEIGHT = 25;
+extern "C" void kprintf(const char *format, ...) {
+  char **arg = (char **) &format;
+  int c;
+  char buf[20];
 
-size_t terminal_row;
-size_t terminal_column;
-uint8_t terminal_color;
-uint16_t *terminal_buffer;
+  arg++;
 
-void terminal_initialize() {
-  terminal_row = 0;
-  terminal_column = 0;
-  terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-  terminal_buffer = (uint16_t *) 0xB8000;
-  for (size_t y = 0; y < VGA_HEIGHT; y++) {
-    for (size_t x = 0; x < VGA_WIDTH; x++) {
-      const size_t index = y * VGA_WIDTH + x;
-      terminal_buffer[index] = vga_entry(' ', terminal_color);
+  while ((c = *format++) != 0) {
+    if (c != '%')
+      putchar(c);
+    else {
+      char *p, *p2;
+      int pad0 = 0, pad = 0;
+
+      c = *format++;
+      if (c == '0') {
+        pad0 = 1;
+        c = *format++;
+      }
+
+      if (c >= '0' && c <= '9') {
+        pad = c - '0';
+        c = *format++;
+      }
+
+      switch (c) {
+        case 'd':
+        case 'u':
+        case 'x': {
+          itoa(buf, c, *((int *) arg++));
+          p = buf;
+          goto string;
+          break;
+        }
+        case 's': {
+          p = *arg++;
+          if (!p)
+            p = "(null)";
+          string:
+          for (p2 = p; *p2; p2++);
+          for (; p2 < p + pad; p2++)
+            putchar(pad0 ? '0' : ' ');
+          while (*p)
+            putchar(*p++);
+          break;
+        }
+        default: {
+          putchar(*((int *) arg++));
+          break;
+        }
+      }
     }
   }
 }
 
-void terminal_set_color(uint8_t color) {
-  terminal_color = color;
-}
-
-void terminal_put_entry_at(char c, uint8_t color, size_t x, size_t y) {
-  const size_t index = y * VGA_WIDTH + x;
-  terminal_buffer[index] = vga_entry(c, color);
-}
-
-void auto_wrap() {
-  if (terminal_column >= VGA_WIDTH) {
-    terminal_column = 0;
-    if (++terminal_row >= VGA_HEIGHT)
-      terminal_row = 0;
+static void init_vbe(multiboot_info_t *mbi) {
+  if (CHECK_FLAG(mbi->flags, 12)) {
+    // TODO: report error
+    return;
   }
 }
 
-void terminal_put_char(char c) {
-  switch (c) {
-    case '\n': {
-      ++terminal_row;
-      terminal_column = 0;
-      break;
-    }
-    case '\r': {
-      terminal_column = 0;
-      break;
-    }
-    default: {
-      terminal_put_entry_at(c, terminal_color, terminal_column, terminal_row);
-      ++terminal_column;
-      break;
-    }
+extern "C" void kmain(unsigned long magic, unsigned long addr) {
+  multiboot_info_t *mbi;
+
+  clear_screen();
+
+  /// 1. Check if MAGIC indicates a valid multiboot header
+  if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
+    kprintf("Invalid magic number: 0x%x\n", (unsigned) magic);
+    return;
   }
-  auto_wrap();
-}
 
-void terminal_write(const char *data, size_t size) {
-  for (size_t i = 0; i < size; i++)
-    terminal_put_char(data[i]);
-}
+  // set mbi to the address of the Multiboot information structure
+  mbi = (multiboot_info_t *) addr;
 
-void terminal_write_string(const char *data) {
-  terminal_write(data, strlen(data));
-}
+  /// 2. Print mbi
+  kprintf("flags = 0x%x\n", (unsigned) mbi->flags);
 
-extern "C" void kernel_main() {
-  terminal_initialize();
+  // mem_lower and mem_upper
+  if (CHECK_FLAG(mbi->flags, 0))
+    kprintf("mem_lower = %uKB, mem_upper = %uKB\n", (unsigned) mbi->mem_lower, (unsigned) mbi->mem_upper);
 
-  terminal_write_string("Hello, kernel World!\n");
-  terminal_write_string("Hello, kernel World!\rFuck , ");
+  // boot_device
+  if (CHECK_FLAG(mbi->flags, 1))
+    kprintf("boot_device = 0x%x\n", (unsigned) mbi->boot_device);
+
+  // cmdline
+  if (CHECK_FLAG(mbi->flags, 2))
+    kprintf("cmdline = %s\n", (char *) mbi->cmdline);
+
+  // mods_*
+  if (CHECK_FLAG(mbi->flags, 3)) {
+    multiboot_module_t *mod;
+    int i;
+
+    kprintf("mods_count = %d, mods_addr = 0x%x\n", (int) mbi->mods_count, (int) mbi->mods_addr);
+    for (i = 0, mod = (multiboot_module_t *) mbi->mods_addr; i < mbi->mods_count; i++, mod++)
+      kprintf(
+          " mod_start = 0x%x, mod_end = 0x%x, cmdline = %s\n",
+          (unsigned) mod->mod_start,
+          (unsigned) mod->mod_end,
+          (char *) mod->cmdline
+      );
+  }
+
+  // Bits 4 and 5 are mutually exclusive
+  if (CHECK_FLAG(mbi->flags, 4) && CHECK_FLAG(mbi->flags, 5)) {
+    kprintf("Both bits 4 and 5 are set.\n");
+    return;
+  }
+
+  // symbol table?
+  if (CHECK_FLAG(mbi->flags, 4)) {
+    multiboot_aout_symbol_table_t *multiboot_aout_sym = &(mbi->u.aout_sym);
+
+    kprintf(
+        "multiboot_aout_symbol_table: tabsize = 0x%0x, strsize = 0x%x, addr = 0x%x\n",
+        (unsigned) multiboot_aout_sym->tabsize,
+        (unsigned) multiboot_aout_sym->strsize,
+        (unsigned) multiboot_aout_sym->addr
+    );
+  }
+
+  // section header table being ELF valid?
+  if (CHECK_FLAG(mbi->flags, 5)) {
+    multiboot_elf_section_header_table_t *multiboot_elf_sec = &(mbi->u.elf_sec);
+
+    kprintf(
+        "multiboot_elf_sec: num = %u, size = 0x%x,"
+        " addr = 0x%x, shndx = 0x%x\n",
+        (unsigned) multiboot_elf_sec->num, (unsigned) multiboot_elf_sec->size,
+        (unsigned) multiboot_elf_sec->addr, (unsigned) multiboot_elf_sec->shndx
+    );
+  }
+
+  // mmap_*
+  if (CHECK_FLAG(mbi->flags, 6)) {
+    multiboot_memory_map_t *mmap;
+
+    kprintf("mmap_addr = 0x%x, mmap_length = 0x%x\n", (unsigned) mbi->mmap_addr, (unsigned) mbi->mmap_length);
+    for (mmap = (multiboot_memory_map_t *) mbi->mmap_addr;
+         (unsigned long) mmap < mbi->mmap_addr + mbi->mmap_length;
+         mmap = (multiboot_memory_map_t *) ((unsigned long) mmap + mmap->size + sizeof(mmap->size)))
+      kprintf(
+          " size = 0x%x, base_addr = 0x%x%08x, length = 0x%x%08x, type = 0x%x\n",
+          (unsigned) mmap->size,
+          (unsigned) (mmap->addr >> 32),
+          (unsigned) (mmap->addr & 0xffffffff),
+          (unsigned) (mmap->len >> 32),
+          (unsigned) (mmap->len & 0xffffffff),
+          (unsigned) mmap->type
+      );
+  }
 }
