@@ -11,7 +11,7 @@ set(MULTIBOOT_OUTPUT_PATH ${CMAKE_BINARY_DIR}/tos.bin)
 add_custom_command(OUTPUT ${MULTIBOOT_OUTPUT_PATH}
         COMMAND echo "Linking $<TARGET_OBJECTS:boot> $<TARGET_OBJECTS:kernel> into a kernel file"
         COMMAND ${CMAKE_C_COMPILER} -T ${PROJECT_SOURCE_DIR}/kernel/linker.ld -o ${MULTIBOOT_OUTPUT_PATH} -ffreestanding -nostdlib $<TARGET_OBJECTS:boot> $<TARGET_OBJECTS:kernel> -lgcc
-        DEPENDS boot kernel ${PROJECT_SOURCE_DIR}/kernel/linker.ld
+        DEPENDS boot kernel ${PROJECT_SOURCE_DIR}/kernel/linker.ld $<TARGET_OBJECTS:boot> $<TARGET_OBJECTS:kernel>
         )
 add_custom_target(multiboot ALL DEPENDS ${MULTIBOOT_OUTPUT_PATH})
 
