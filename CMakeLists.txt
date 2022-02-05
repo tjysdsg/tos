@@ -3,7 +3,11 @@ project(tos C CXX ASM)
 
 add_library(boot OBJECT kernel/boot.S)
 
-add_library(kernel OBJECT kernel/kernel.cpp kernel/FrameBufferFontWriter.cpp kernel/FrameBuffer.cpp)
+add_library(kernel OBJECT
+        kernel/kernel.cpp
+        kernel/FrameBufferFontWriter.cpp
+        kernel/FrameBuffer.cpp
+        kernel/gdt.cpp)
 target_compile_options(kernel PRIVATE -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti)
 
 # generate multiboot-compliant kernel file

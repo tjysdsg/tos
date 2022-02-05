@@ -1,6 +1,8 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "multiboot.h"
+#include "kprintf.h"
+#include "gdt.h"
 #include "FrameBuffer.h"
 
 // check if the bit BIT in FLAGS is set
@@ -173,6 +175,7 @@ extern "C" void kmain(unsigned long magic, unsigned long addr) {
   //    fb.put_pixel(i, i);
   //  }
 
+  /*
   /// 2. Print multiboot header and multiboot information
   kprintf("multiboot header:\n");
   kprintf("  flags = 0x%x\n", multiboot_header.flags);
@@ -186,6 +189,7 @@ extern "C" void kmain(unsigned long magic, unsigned long addr) {
   kprintf("  height = %d\n", multiboot_header.height);
   kprintf("  depth = %d\n", multiboot_header.depth);
 
+  /// https://www.gnu.org/software/grub/manual/multiboot/multiboot.html
   kprintf("multiboot info:\n");
   kprintf("  flags = 0x%x\n", (unsigned) mbi->flags);
 
@@ -257,4 +261,7 @@ extern "C" void kmain(unsigned long magic, unsigned long addr) {
           (unsigned) mmap->type
       );
   }
+  */
+
+  init_gdt();
 }

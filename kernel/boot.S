@@ -13,7 +13,7 @@
 #define MULTIBOOT_HEADER_FLAGS MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO | MULTIBOOT_VIDEO_MODE | AOUT_KLUDGE
 
 .text
-        .globl  start, _start, multiboot_header
+        .global  start, _start, multiboot_header, set_gdt, gdtr
 
 start:
 _start:
@@ -74,15 +74,47 @@ multiboot_entry:
         // kmain(magic, multiboot_info)
         call    kmain
 
-        // Halt
+halt:
         pushl   $halt_message
         call    kprintf
 
 loop:   hlt
         jmp     loop
 
-halt_message:
-        .asciz  "System halt"
+gdtr:
+    .value 0 // size
+    .long 0  // offset
 
-        // stack
-        .comm   stack, STACK_SIZE
+set_gdt:
+    lgdt (gdtr)
+
+    // debug print gdtr
+    // pushl gdtr
+    // pushl $int_msg
+    // call kprintf
+    // popl %eax
+    // popl %eax
+    // ret
+
+    // reload data segment registers
+    movw $0x10, %ax
+    movw %ax, %ds
+    movw %ax, %es
+    movw %ax, %fs
+    movw %ax, %gs
+    movw %ax, %ss
+
+    jmp $0x08, $flush
+
+flush:
+    ret
+
+halt_message:
+    .asciz "System halt"
+
+int_msg:
+    .asciz "%0x\n"
+
+// stack
+.comm stack, STACK_SIZE
+
