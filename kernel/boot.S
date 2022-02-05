@@ -13,7 +13,7 @@
 #define MULTIBOOT_HEADER_FLAGS MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO | MULTIBOOT_VIDEO_MODE | AOUT_KLUDGE
 
 .text
-        .globl  start, _start
+        .globl  start, _start, multiboot_header
 
 start:
 _start:

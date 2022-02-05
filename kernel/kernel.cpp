@@ -173,40 +173,47 @@ extern "C" void kmain(unsigned long magic, unsigned long addr) {
   //    fb.put_pixel(i, i);
   //  }
 
-  /// 2. Print mbi
-  kprintf("flags = 0x%x\n", (unsigned) mbi->flags);
+  /// 2. Print multiboot header and multiboot information
+  kprintf("multiboot header:\n");
+  kprintf("  flags = 0x%x\n", multiboot_header.flags);
+  kprintf("  header_addr = 0x%x\n", multiboot_header.header_addr);
+  kprintf("  load_addr = 0x%x\n", multiboot_header.load_addr);
+  kprintf("  load_end_addr = 0x%x\n", multiboot_header.load_end_addr);
+  kprintf("  bss_end_addr = 0x%x\n", multiboot_header.bss_end_addr);
+  kprintf("  entry_addr = 0x%x\n", multiboot_header.entry_addr);
+  kprintf("  mode_type = %d\n", multiboot_header.mode_type);
+  kprintf("  width = %d\n", multiboot_header.width);
+  kprintf("  height = %d\n", multiboot_header.height);
+  kprintf("  depth = %d\n", multiboot_header.depth);
+
+  kprintf("multiboot info:\n");
+  kprintf("  flags = 0x%x\n", (unsigned) mbi->flags);
 
   // mem_lower and mem_upper
   if (CHECK_FLAG(mbi->flags, 0))
-    kprintf("mem_lower = %uKB, mem_upper = %uKB\n", (unsigned) mbi->mem_lower, (unsigned) mbi->mem_upper);
+    kprintf("  mem_lower = %uKB, mem_upper = %uKB\n", (unsigned) mbi->mem_lower, (unsigned) mbi->mem_upper);
 
   // boot_device
   if (CHECK_FLAG(mbi->flags, 1))
-    kprintf("boot_device = 0x%x\n", (unsigned) mbi->boot_device);
+    kprintf("  boot_device = 0x%x\n", (unsigned) mbi->boot_device);
 
   // cmdline
   if (CHECK_FLAG(mbi->flags, 2))
-    kprintf("cmdline = %s\n", (char *) mbi->cmdline);
+    kprintf("  cmdline = %s\n", (char *) mbi->cmdline);
 
   // mods_*
   if (CHECK_FLAG(mbi->flags, 3)) {
     multiboot_module_t *mod;
     int i;
 
-    kprintf("mods_count = %d, mods_addr = 0x%x\n", (int) mbi->mods_count, (int) mbi->mods_addr);
+    kprintf("  mods_count = %d, mods_addr = 0x%x\n", (int) mbi->mods_count, (int) mbi->mods_addr);
     for (i = 0, mod = (multiboot_module_t *) mbi->mods_addr; i < mbi->mods_count; i++, mod++)
       kprintf(
-          " mod_start = 0x%x, mod_end = 0x%x, cmdline = %s\n",
+          "    mod_start = 0x%x, mod_end = 0x%x, cmdline = %s\n",
           (unsigned) mod->mod_start,
           (unsigned) mod->mod_end,
           (char *) mod->cmdline
       );
-  }
-
-  // Bits 4 and 5 are mutually exclusive
-  if (CHECK_FLAG(mbi->flags, 4) && CHECK_FLAG(mbi->flags, 5)) {
-    kprintf("Both bits 4 and 5 are set.\n");
-    return;
   }
 
   // symbol table?
@@ -214,7 +221,7 @@ extern "C" void kmain(unsigned long magic, unsigned long addr) {
     multiboot_aout_symbol_table_t *multiboot_aout_sym = &(mbi->u.aout_sym);
 
     kprintf(
-        "multiboot_aout_symbol_table: tabsize = 0x%0x, strsize = 0x%x, addr = 0x%x\n",
+        "  multiboot_aout_symbol_table: tabsize = 0x%0x, strsize = 0x%x, addr = 0x%x\n",
         (unsigned) multiboot_aout_sym->tabsize,
         (unsigned) multiboot_aout_sym->strsize,
         (unsigned) multiboot_aout_sym->addr
@@ -226,8 +233,7 @@ extern "C" void kmain(unsigned long magic, unsigned long addr) {
     multiboot_elf_section_header_table_t *multiboot_elf_sec = &(mbi->u.elf_sec);
 
     kprintf(
-        "multiboot_elf_sec: num = %u, size = 0x%x,"
-        " addr = 0x%x, shndx = 0x%x\n",
+        "  multiboot_elf_sec: num = %u, size = 0x%x, addr = 0x%x, shndx = 0x%x\n",
         (unsigned) multiboot_elf_sec->num, (unsigned) multiboot_elf_sec->size,
         (unsigned) multiboot_elf_sec->addr, (unsigned) multiboot_elf_sec->shndx
     );
@@ -237,12 +243,12 @@ extern "C" void kmain(unsigned long magic, unsigned long addr) {
   if (CHECK_FLAG(mbi->flags, 6)) {
     multiboot_memory_map_t *mmap;
 
-    kprintf("mmap_addr = 0x%x, mmap_length = 0x%x\n", (unsigned) mbi->mmap_addr, (unsigned) mbi->mmap_length);
+    kprintf("  mmap_addr = 0x%x, mmap_length = 0x%x\n", (unsigned) mbi->mmap_addr, (unsigned) mbi->mmap_length);
     for (mmap = (multiboot_memory_map_t *) mbi->mmap_addr;
          (unsigned long) mmap < mbi->mmap_addr + mbi->mmap_length;
          mmap = (multiboot_memory_map_t *) ((unsigned long) mmap + mmap->size + sizeof(mmap->size)))
       kprintf(
-          " size = 0x%x, base_addr = 0x%x%08x, length = 0x%x%08x, type = 0x%x\n",
+          "    size = 0x%x, base_addr = 0x%x%08x, length = 0x%x%08x, type = 0x%x\n",
           (unsigned) mmap->size,
           (unsigned) (mmap->addr >> 32),
           (unsigned) (mmap->addr & 0xffffffff),
