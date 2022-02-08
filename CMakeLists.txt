@@ -5,6 +5,8 @@ add_library(boot OBJECT kernel/boot.S)
 
 add_library(kernel OBJECT
         kernel/kernel.cpp
+        kernel/kprintf.cpp
+        kernel/tty.cpp
         kernel/FrameBufferFontWriter.cpp
         kernel/FrameBuffer.cpp
         kernel/gdt.cpp)
