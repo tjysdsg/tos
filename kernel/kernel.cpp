@@ -1,7 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "multiboot.h"
-#include "gdt.h"
 #include "tty.h"
 #include "kprintf.h"
 #include "FrameBuffer.h"

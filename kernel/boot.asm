@@ -9,10 +9,10 @@ MBOOT_CHECKSUM      equ -(MBOOT_HEADER_MAGIC + MBOOT_HEADER_FLAGS)
 
 [BITS 32]
 
-[GLOBAL multiboot_header]
-[EXTERN code]                   ; see linker.ld
-[EXTERN bss]                    ; see linker.ld
-[EXTERN end]                    ; see linker.ld
+global multiboot_header
+extern code                   ; see linker.ld
+extern bss                    ; see linker.ld
+extern end                    ; see linker.ld
 
 multiboot_header:
   dd MBOOT_HEADER_MAGIC
@@ -33,12 +33,13 @@ multiboot_header:
   ; dd 768
   ; dd 32
 
-[GLOBAL start]
-[EXTERN kmain]                 ; see kernel.cpp
+global start
+extern load_gdt
+extern kmain                 ; see kernel.cpp
 
 start:
-  push    ebx                  ; Load multiboot header location
+  call load_gdt
 
-  cli                          ; Disable interrupts
+  push    ebx                  ; Load multiboot header location
   call kmain                   ; call our main() function
   hlt

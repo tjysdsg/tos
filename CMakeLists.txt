@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(tos C CXX ASM_NASM)
 
-add_library(boot OBJECT kernel/boot.asm)
+add_library(boot OBJECT kernel/boot.asm kernel/gdt.asm)
 
 add_library(kernel OBJECT
         kernel/kernel.cpp
@@ -9,7 +9,7 @@ add_library(kernel OBJECT
         kernel/tty.cpp
         kernel/FrameBufferFontWriter.cpp
         kernel/FrameBuffer.cpp
-        kernel/gdt.cpp)
+        )
 target_compile_options(kernel PRIVATE -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti)
 
 # generate multiboot-compliant kernel file
