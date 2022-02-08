@@ -1,5 +1,4 @@
-ENTRY(_start)
-
+ENTRY(start)
 SECTIONS
 {
 	/**
@@ -8,13 +7,14 @@ SECTIONS
 	 */
 	.text BLOCK(4K) : ALIGN(4K)
 	{
-		*(.multiboot)
+	    code = .;
 		*(.text)
 	}
 
 	/* Read-only data. */
 	.rodata BLOCK(4K) : ALIGN(4K)
 	{
+	    data = .;
 		*(.rodata)
 	}
 
@@ -27,10 +27,9 @@ SECTIONS
 	/* Read-write data (uninitialized) and stack */
 	.bss BLOCK(4K) : ALIGN(4K)
 	{
-		*(COMMON)
+	    bss = .;
 		*(.bss)
 	}
 
-	/* The compiler may produce other sections, by default it will put them in
-	   a segment with the same name. Simply add stuff here as needed. */
+  end = .; _end = .; __end = .;
 }

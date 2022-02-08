@@ -6,7 +6,11 @@
 // video memory address
 #define VIDEO                   0xB8000
 
+struct multiboot_header_t;
+
 extern "C" {
+
+void init_tty(multiboot_header_t *mboot_header);
 
 void putchar(char character);
 

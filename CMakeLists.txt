@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
-project(tos C CXX ASM)
+project(tos C CXX ASM_NASM)
 
-add_library(boot OBJECT kernel/boot.S)
+add_library(boot OBJECT kernel/boot.asm)
 
 add_library(kernel OBJECT
         kernel/kernel.cpp

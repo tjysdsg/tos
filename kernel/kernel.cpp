@@ -16,19 +16,12 @@ static void init_vbe(multiboot_info_t *mbi) {
   }
 }
 
-extern "C" void kmain(unsigned long magic, unsigned long addr) {
-  multiboot_info_t *mbi;
+extern "C" void kmain(unsigned long addr) {
+  auto *mbi = (multiboot_info_t *) addr;
+
+  init_tty(&multiboot_header);
 
   clear_screen();
-
-  /// 1. Check if MAGIC indicates a valid multiboot header
-  if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
-    kprintf("Invalid magic number: 0x%x\n", (unsigned) magic);
-    return;
-  }
-
-  // set mbi to the address of the Multiboot information structure
-  mbi = (multiboot_info_t *) addr;
 
   // TODO: implement font drawing using VBE
   //  init_vbe(mbi);
@@ -40,7 +33,6 @@ extern "C" void kmain(unsigned long magic, unsigned long addr) {
   //    fb.put_pixel(i, i);
   //  }
 
-  /*
   /// 2. Print multiboot header and multiboot information
   kprintf("multiboot header:\n");
   kprintf("  flags = 0x%x\n", multiboot_header.flags);
@@ -126,7 +118,4 @@ extern "C" void kmain(unsigned long magic, unsigned long addr) {
           (unsigned) mmap->type
       );
   }
-  */
-
-  init_gdt();
 }

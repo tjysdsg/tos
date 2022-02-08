@@ -3,8 +3,14 @@
 
 static int xpos;
 static int ypos;
+static int TERM_LINES;
+static int TERM_COLUMNS;
 static volatile uint8_t *video = (unsigned char *) VIDEO; /// video memory
 
+void init_tty(multiboot_header_t *mboot_header) {
+  TERM_COLUMNS = mboot_header->width;
+  TERM_LINES = mboot_header->height;
+}
 
 void putchar(char c) {
   if (c == '\n' || c == '\r') {
