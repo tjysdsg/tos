@@ -60,4 +60,11 @@ load_gdt:
     mov fs, ax
     mov gs, ax
     mov ss, ax
+    mov byte [gdt_initialized], 0x1
     ret
+
+global gdt_initialized
+
+section .data
+gdt_initialized:
+    db 0

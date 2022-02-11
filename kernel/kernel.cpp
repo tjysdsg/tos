@@ -8,6 +8,8 @@
 // check if the bit BIT in FLAGS is set
 #define CHECK_FLAG(flags, bit)   ((flags) & (1 << (bit)))
 
+extern "C" uint8_t gdt_initialized;
+
 static void init_vbe(multiboot_info_t *mbi) {
   if (CHECK_FLAG(mbi->flags, 12)) {
     // TODO: report error
@@ -21,6 +23,12 @@ extern "C" void kmain(unsigned long addr) {
   init_tty(&multiboot_header);
 
   clear_screen();
+
+  if (gdt_initialized == 0) {
+    kprintf("ERROR: GDT is not initialized\n");
+    return;
+  }
+
 
   // TODO: implement font drawing using VBE
   //  init_vbe(mbi);
