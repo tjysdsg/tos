@@ -38,6 +38,7 @@ extern load_gdt
 extern kmain                 ; see kernel.cpp
 
 start:
+  cli  ; disable interrupts until IDT is loaded
   call load_gdt
 
   push    ebx                  ; Load multiboot header location
