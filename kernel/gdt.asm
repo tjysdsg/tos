@@ -63,8 +63,14 @@ load_gdt:
     mov byte [gdt_initialized], 0x1
     ret
 
-global gdt_initialized
 
 section .data
+global gdt_initialized, gdt_code_seg_selector, gdt_data_seg_selector
 gdt_initialized:
     db 0
+
+; segment selector of gdt_code and gdt_data (see above)
+gdt_code_seg_selector:
+    dw 0x8
+gdt_data_seg_selector:
+    dw 0x10

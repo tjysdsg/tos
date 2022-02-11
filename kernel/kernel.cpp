@@ -1,14 +1,11 @@
-#include <stddef.h>
-#include <stdint.h>
 #include "multiboot.h"
 #include "tty.h"
 #include "kprintf.h"
-#include "FrameBuffer.h"
+#include "gdt.h"
+#include "idt.h"
 
 // check if the bit BIT in FLAGS is set
 #define CHECK_FLAG(flags, bit)   ((flags) & (1 << (bit)))
-
-extern "C" uint8_t gdt_initialized;
 
 static void init_vbe(multiboot_info_t *mbi) {
   if (CHECK_FLAG(mbi->flags, 12)) {
@@ -21,7 +18,6 @@ extern "C" void kmain(unsigned long addr) {
   auto *mbi = (multiboot_info_t *) addr;
 
   init_tty(&multiboot_header);
-
   clear_screen();
 
   if (gdt_initialized == 0) {
@@ -29,6 +25,14 @@ extern "C" void kmain(unsigned long addr) {
     return;
   }
 
+  init_idt();
+
+  // test idt
+  /*
+  asm volatile ("int $3");
+  asm volatile ("int $10");
+  asm volatile ("int $31");
+  */
 
   // TODO: implement font drawing using VBE
   //  init_vbe(mbi);
