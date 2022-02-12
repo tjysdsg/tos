@@ -4,6 +4,8 @@
 #include "gdt.h"
 #include "idt.h"
 
+extern uint8_t _kernel_seg_end;
+
 extern "C" void kmain(unsigned long addr) {
   auto *mbi = (multiboot_info_t *) addr;
 
@@ -17,7 +19,14 @@ extern "C" void kmain(unsigned long addr) {
 
   init_idt();
 
-  kprintf("Hello World\n");
+  { // find kernel memory start address, align by 4KB
+    auto kernel_seg_end = (uint32_t) &_kernel_seg_end;
+    uint32_t remain = kernel_seg_end % 4096;
+    uint32_t fill = 4096 - remain;
+    kernel_seg_end += fill;
+    // TODO: assert(kernel_seg_end % 4096 == 0);
+    kprintf("Kernel memory start = 0x%x\n", kernel_seg_end);
+  }
 
   // test idt
   /*

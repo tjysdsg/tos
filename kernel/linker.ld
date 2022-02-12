@@ -7,14 +7,14 @@ SECTIONS
 	 */
 	.text BLOCK(4K) : ALIGN(4K)
 	{
-	    code = .;
+	    _kernel_seg_code = .;
 		*(.text)
 	}
 
 	/* Read-only data. */
 	.rodata BLOCK(4K) : ALIGN(4K)
 	{
-	    data = .;
+	    _kernel_seg_data = .;
 		*(.rodata)
 	}
 
@@ -27,9 +27,9 @@ SECTIONS
 	/* Read-write data (uninitialized) and stack */
 	.bss BLOCK(4K) : ALIGN(4K)
 	{
-	    bss = .;
+	    _kernel_seg_bss = .;
 		*(.bss)
 	}
 
-  end = .; _end = .; __end = .;
+    _kernel_seg_end = .;
 }

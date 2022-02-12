@@ -10,20 +10,20 @@ MBOOT_CHECKSUM      equ -(MBOOT_HEADER_MAGIC + MBOOT_HEADER_FLAGS)
 [BITS 32]
 
 global multiboot_header
-extern code                   ; see linker.ld
-extern bss                    ; see linker.ld
-extern end                    ; see linker.ld
+extern _kernel_seg_code ; see linker.ld
+extern _kernel_seg_bss  ; see linker.ld
+extern _kernel_seg_end  ; see linker.ld
 
 multiboot_header:
   dd MBOOT_HEADER_MAGIC
   dd MBOOT_HEADER_FLAGS
   dd MBOOT_CHECKSUM
 
-  dd multiboot_header          ; header_addr
-  dd code                      ; load_addr
-  dd bss                       ; load_end_addr
-  dd end                       ; bss_end_addr.
-  dd start                     ; entry_addr
+  dd multiboot_header    ; header_addr
+  dd _kernel_seg_code    ; load_addr
+  dd _kernel_seg_bss     ; load_end_addr
+  dd _kernel_seg_end     ; bss_end_addr.
+  dd start               ; entry_addr
 
   ; dd 1                         ; graphics mode type. 0 for linear graphics mode, 1 for EGA-standard text mode
   ; dd 80                        ; width
