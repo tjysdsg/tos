@@ -9,6 +9,7 @@ add_library(kernel OBJECT
         kernel/kernel.cpp
         kernel/kprintf.cpp
         kernel/kpanic.cpp
+        kernel/port.cpp
         kernel/tty.c
         kernel/idt.cpp
         kernel/isr.cpp

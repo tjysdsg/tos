@@ -45,4 +45,4 @@ start:
 
   push    ebx                  ; Load multiboot header location
   call kmain                   ; call our main() function
-  hlt
+  jmp $

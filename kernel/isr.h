@@ -37,6 +37,23 @@ void isr29();
 void isr30();
 void isr31();
 
+void irq0();
+void irq1();
+void irq2();
+void irq3();
+void irq4();
+void irq5();
+void irq6();
+void irq7();
+void irq8();
+void irq9();
+void irq10();
+void irq11();
+void irq12();
+void irq13();
+void irq14();
+void irq15();
+
 struct registers_t {
   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; // pushed by pushad
   uint32_t int_no, err_code;                       // interrupt number and error code (if applicable)
@@ -44,6 +61,10 @@ struct registers_t {
 };
 
 void isr_handler(registers_t regs);
+void irq_handler(registers_t regs);
+
+typedef void (*isr_t)(registers_t);
+void register_interrupt_handler(uint8_t n, isr_t handler);
 
 }
 

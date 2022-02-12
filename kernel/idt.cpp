@@ -2,6 +2,7 @@
 #include "isr.h"
 #include "gdt.h"
 #include "kprintf.h"
+#include "port.h"
 #include <stdint.h>
 
 #define IDT_TASK_GATE           0x5
@@ -25,6 +26,20 @@ void create_idt_entry(idt_entry_t *entry, uint32_t offset, uint16_t selector, ui
 
 void init_idt() {
   static_assert(sizeof(idt_entry_t) == 8);
+
+  // init PIC
+  // TODO: use APIC
+  // remap IRQ 0-15 to 32-47, since 0-31 is reserved for exceptions/faults
+  outb(0x20, 0x11);
+  outb(0xA0, 0x11);
+  outb(0x21, 0x20);
+  outb(0xA1, 0x28);
+  outb(0x21, 0x04);
+  outb(0xA1, 0x02);
+  outb(0x21, 0x01);
+  outb(0xA1, 0x01);
+  outb(0x21, 0x0);
+  outb(0xA1, 0x0);
 
   create_idt_entry(&idt_entries[0], (uint32_t) isr0, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
   create_idt_entry(&idt_entries[1], (uint32_t) isr1, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
@@ -58,6 +73,23 @@ void init_idt() {
   create_idt_entry(&idt_entries[29], (uint32_t) isr29, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
   create_idt_entry(&idt_entries[30], (uint32_t) isr30, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
   create_idt_entry(&idt_entries[31], (uint32_t) isr31, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+
+  create_idt_entry(&idt_entries[32], (uint32_t) irq0, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+  create_idt_entry(&idt_entries[33], (uint32_t) irq1, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+  create_idt_entry(&idt_entries[34], (uint32_t) irq2, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+  create_idt_entry(&idt_entries[35], (uint32_t) irq3, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+  create_idt_entry(&idt_entries[36], (uint32_t) irq4, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+  create_idt_entry(&idt_entries[37], (uint32_t) irq5, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+  create_idt_entry(&idt_entries[38], (uint32_t) irq6, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+  create_idt_entry(&idt_entries[39], (uint32_t) irq7, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+  create_idt_entry(&idt_entries[40], (uint32_t) irq8, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+  create_idt_entry(&idt_entries[41], (uint32_t) irq9, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+  create_idt_entry(&idt_entries[42], (uint32_t) irq10, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+  create_idt_entry(&idt_entries[43], (uint32_t) irq11, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+  create_idt_entry(&idt_entries[44], (uint32_t) irq12, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+  create_idt_entry(&idt_entries[45], (uint32_t) irq13, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+  create_idt_entry(&idt_entries[46], (uint32_t) irq14, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
+  create_idt_entry(&idt_entries[47], (uint32_t) irq15, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
 
   idtr.size = sizeof(idt_entry_t) * 256 - 1;
   idtr.offset = (uint32_t) idt_entries;

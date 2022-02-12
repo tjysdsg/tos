@@ -36,7 +36,28 @@ isr%1:
     iret
 %endmacro
 
-extern isr_handler  ; see idt.cpp
+; creates a stub for an IRQ
+; args:
+;   1. the IRQ number
+;   2. the ISR number it is remapped to
+%macro IRQ 2
+  global irq%1
+  irq%1:
+    cli
+    push byte 0
+    push byte %2
+    pushad ; edi,esi,ebp,esp,ebx,edx,ecx,eax
+    call irq_handler
+    popad
+
+    add esp, 8
+    sti
+    iret
+%endmacro
+
+
+extern isr_handler  ; see isr.cpp
+extern irq_handler  ; see isr.cpp
 
 ISR_INT_HANDLER 0
 ISR_INT_HANDLER 1
@@ -70,3 +91,20 @@ ISR_INT_HANDLER 28
 ISR_INT_HANDLER 29
 ISR_INT_HANDLER 30
 ISR_INT_HANDLER 31
+
+IRQ   0,  32
+IRQ   1,  33
+IRQ   2,  34
+IRQ   3,  35
+IRQ   4,  36
+IRQ   5,  37
+IRQ   6,  38
+IRQ   7,  39
+IRQ   8,  40
+IRQ   9,  41
+IRQ   10, 42
+IRQ   11, 43
+IRQ   12, 44
+IRQ   13, 45
+IRQ   14, 46
+IRQ   15, 47

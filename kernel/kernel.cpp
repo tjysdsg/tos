@@ -26,12 +26,13 @@ extern "C" void kmain(unsigned long addr) {
     kprintf("Kernel memory start = 0x%x\n", kernel_seg_end);
   }
 
-  // test idt
+  // test IDT
   /*
   asm volatile ("int $3");
   asm volatile ("int $10");
-  asm volatile ("int $31");
+  asm volatile ("int $31"); // IRQ
   */
+  asm volatile ("int $33"); // IRQ
 
   /// 2. Print multiboot header and multiboot information
   kprintf("multiboot header:\n");
