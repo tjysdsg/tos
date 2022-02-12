@@ -94,4 +94,10 @@ void init_idt() {
   idtr.size = sizeof(idt_entry_t) * 256 - 1;
   idtr.offset = (uint32_t) idt_entries;
   flush_idt((uint32_t) &idtr);
+
+  init_interrupt_handlers();
+}
+
+void enable_interrupt() {
+  asm volatile("sti");
 }

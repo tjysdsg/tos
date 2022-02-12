@@ -23,6 +23,7 @@ struct idtr_t {
 } __attribute__((packed));
 
 void init_idt();
+void enable_interrupt();
 
 extern "C" void flush_idt(uint32_t idtr);
 #endif //TOS_KERNEL_IDT_H

@@ -10,6 +10,7 @@ add_library(kernel OBJECT
         kernel/kprintf.cpp
         kernel/kpanic.cpp
         kernel/port.cpp
+        kernel/pit.cpp
         kernel/tty.c
         kernel/idt.cpp
         kernel/isr.cpp

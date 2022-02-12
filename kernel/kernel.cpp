@@ -4,6 +4,7 @@
 #include "gdt.h"
 #include "idt.h"
 #include "kpanic.h"
+#include "pit.h"
 
 extern uint8_t _kernel_seg_end;
 
@@ -16,6 +17,9 @@ extern "C" void kmain(unsigned long addr) {
   kassert(gdt_initialized, "GDT is not initialized");
 
   init_idt();
+  init_pit_timer(1);
+
+  enable_interrupt();
 
   { // find kernel memory start address, align by 4KB
     auto kernel_seg_end = (uint32_t) &_kernel_seg_end;
@@ -30,9 +34,8 @@ extern "C" void kmain(unsigned long addr) {
   /*
   asm volatile ("int $3");
   asm volatile ("int $10");
-  asm volatile ("int $31"); // IRQ
-  */
   asm volatile ("int $33"); // IRQ
+  */
 
   /// 2. Print multiboot header and multiboot information
   kprintf("multiboot header:\n");
