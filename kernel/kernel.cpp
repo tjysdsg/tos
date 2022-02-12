@@ -3,6 +3,7 @@
 #include "kprintf.h"
 #include "gdt.h"
 #include "idt.h"
+#include "kpanic.h"
 
 extern uint8_t _kernel_seg_end;
 
@@ -12,10 +13,7 @@ extern "C" void kmain(unsigned long addr) {
   init_tty(mbi);
   clear_screen();
 
-  if (gdt_initialized == 0) {
-    kprintf("ERROR: GDT is not initialized\n");
-    return;
-  }
+  kassert(gdt_initialized, "GDT is not initialized");
 
   init_idt();
 
@@ -24,7 +22,7 @@ extern "C" void kmain(unsigned long addr) {
     uint32_t remain = kernel_seg_end % 4096;
     uint32_t fill = 4096 - remain;
     kernel_seg_end += fill;
-    // TODO: assert(kernel_seg_end % 4096 == 0);
+    kassert(kernel_seg_end % 4096 == 0, "Cannot find kernel memory starting address");
     kprintf("Kernel memory start = 0x%x\n", kernel_seg_end);
   }
 
