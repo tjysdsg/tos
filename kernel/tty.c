@@ -1,5 +1,6 @@
 #include "tty.h"
 #include "multiboot.h"
+#include "kpanic.h"
 
 #define SSFN_CONSOLEBITMAP_TRUECOLOR
 // fix errors in ssfn.h using these macros
@@ -104,6 +105,7 @@ void clear_screen() {
     xpos = 0;
     ypos = 0;
   } else {
+    kassert(terminal_bpp && terminal_width && terminal_height, "Invalid terminal screen size");
     for (uint32_t i = 0; i < terminal_width * terminal_height * terminal_bpp / 8; ++i) {
       ssfn_dst.ptr[i] = 0;
     }
