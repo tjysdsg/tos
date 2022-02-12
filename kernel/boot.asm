@@ -24,14 +24,16 @@ multiboot_header:
   dd bss                       ; load_end_addr
   dd end                       ; bss_end_addr.
   dd start                     ; entry_addr
-  dd 1                         ; graphics mode type. 0 for linear graphics mode, 1 for EGA-standard text mode
-  dd 80                        ; width
-  dd 24                        ; height
-  dd 0                         ; depth
-  ; dd 0
-  ; dd 1024
-  ; dd 768
-  ; dd 32
+
+  ; dd 1                         ; graphics mode type. 0 for linear graphics mode, 1 for EGA-standard text mode
+  ; dd 80                        ; width
+  ; dd 24                        ; height
+  ; dd 0                         ; depth
+
+  dd 0
+  dd 1024
+  dd 768
+  dd 32
 
 global start
 extern load_gdt

@@ -4,20 +4,10 @@
 #include "gdt.h"
 #include "idt.h"
 
-// check if the bit BIT in FLAGS is set
-#define CHECK_FLAG(flags, bit)   ((flags) & (1 << (bit)))
-
-static void init_vbe(multiboot_info_t *mbi) {
-  if (CHECK_FLAG(mbi->flags, 12)) {
-    // TODO: report error
-    return;
-  }
-}
-
 extern "C" void kmain(unsigned long addr) {
   auto *mbi = (multiboot_info_t *) addr;
 
-  init_tty(&multiboot_header);
+  init_tty(mbi);
   clear_screen();
 
   if (gdt_initialized == 0) {
@@ -27,22 +17,14 @@ extern "C" void kmain(unsigned long addr) {
 
   init_idt();
 
+  kprintf("Hello World\n");
+
   // test idt
   /*
   asm volatile ("int $3");
   asm volatile ("int $10");
   asm volatile ("int $31");
   */
-
-  // TODO: implement font drawing using VBE
-  //  init_vbe(mbi);
-  //  FrameBuffer fb(mbi->framebuffer_type,
-  //                 mbi->framebuffer_bpp,
-  //                 mbi->framebuffer_pitch,
-  //                 reinterpret_cast<uint8_t *>(mbi->framebuffer_addr));
-  //  for (int i = 0; i < 500; ++i) {
-  //    fb.put_pixel(i, i);
-  //  }
 
   /// 2. Print multiboot header and multiboot information
   kprintf("multiboot header:\n");

@@ -2,7 +2,14 @@
 #define TOS_KERNEL_MULTIBOOT_H
 #include "stdint.h"
 
-struct multiboot_header_t {
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// check if the bit BIT in FLAGS is set
+#define CHECK_FLAG(flags, bit)   ((flags) & (1 << (bit)))
+
+typedef struct {
   /* Must be MULTIBOOT_MAGIC */
   uint32_t magic;
 
@@ -24,29 +31,27 @@ struct multiboot_header_t {
   uint32_t width;
   uint32_t height;
   uint32_t depth;
-};
+} multiboot_header_t;
 
-extern "C" multiboot_header_t multiboot_header;
+extern multiboot_header_t multiboot_header;
 
 /* The symbol table for a.out. */
-struct multiboot_aout_symbol_table {
+typedef struct {
   uint32_t tabsize;
   uint32_t strsize;
   uint32_t addr;
   uint32_t reserved;
-};
-typedef struct multiboot_aout_symbol_table multiboot_aout_symbol_table_t;
+} multiboot_aout_symbol_table_t;
 
 /* The section header table for ELF. */
-struct multiboot_elf_section_header_table {
+typedef struct {
   uint32_t num;
   uint32_t size;
   uint32_t addr;
   uint32_t shndx;
-};
-typedef struct multiboot_elf_section_header_table multiboot_elf_section_header_table_t;
+} multiboot_elf_section_header_table_t;
 
-struct multiboot_info {
+typedef struct {
   /* Multiboot info version number */
   uint32_t flags;
 
@@ -117,16 +122,9 @@ struct multiboot_info {
       uint8_t framebuffer_blue_mask_size;
     };
   };
-};
-typedef struct multiboot_info multiboot_info_t;
+} multiboot_info_t;
 
-struct multiboot_color {
-  uint8_t red;
-  uint8_t green;
-  uint8_t blue;
-};
-
-struct multiboot_mmap_entry {
+typedef struct {
   uint32_t size;
   uint64_t addr;
   uint64_t len;
@@ -136,10 +134,9 @@ struct multiboot_mmap_entry {
 #define MULTIBOOT_MEMORY_NVS                    4
 #define MULTIBOOT_MEMORY_BADRAM                 5
   uint32_t type;
-} __attribute__((packed));
-typedef struct multiboot_mmap_entry multiboot_memory_map_t;
+} __attribute__((packed)) multiboot_memory_map_t;
 
-struct multiboot_mod_list {
+typedef struct {
   /* the memory used goes from bytes ’mod_start’ to ’mod_end-1’ inclusive */
   uint32_t mod_start;
   uint32_t mod_end;
@@ -149,11 +146,10 @@ struct multiboot_mod_list {
 
   /* padding to take it to 16 bytes (must be zero) */
   uint32_t pad;
-};
-typedef struct multiboot_mod_list multiboot_module_t;
+} multiboot_module_t;
 
 /* APM BIOS info. */
-struct multiboot_apm_info {
+typedef struct {
   uint16_t version;
   uint16_t cseg;
   uint32_t offset;
@@ -163,6 +159,10 @@ struct multiboot_apm_info {
   uint16_t cseg_len;
   uint16_t cseg_16_len;
   uint16_t dseg_len;
-};
+} multiboot_apm_info_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* TOS_KERNEL_MULTIBOOT_H */

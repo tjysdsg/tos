@@ -1,18 +1,30 @@
 cmake_minimum_required(VERSION 3.16)
 project(tos C CXX ASM_NASM)
 
+include_directories(thirdparty)
+
 add_library(boot OBJECT kernel/boot.asm kernel/gdt.asm kernel/idt.asm)
 
 add_library(kernel OBJECT
         kernel/kernel.cpp
         kernel/kprintf.cpp
-        kernel/tty.cpp
-        kernel/FrameBufferFontWriter.cpp
-        kernel/FrameBuffer.cpp
+        kernel/tty.c
         kernel/idt.cpp
         kernel/isr.cpp
         )
 target_compile_options(kernel PRIVATE -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -O2)
+
+# prepare ssfn font file for linking with the kernel
+set(FONT_O_PATH ${CMAKE_BINARY_DIR}/ssfn.o)
+set(FONT_PATH ${PROJECT_SOURCE_DIR}/data/font/unifont.sfn)
+add_custom_command(
+        OUTPUT ${FONT_O_PATH}
+        COMMAND cp ${FONT_PATH} font.sfn
+        COMMAND echo Creating ssfn.o: ${TOOLCHAIN_LINKER} -r -b binary -o ${FONT_O_PATH} font.sfn
+        COMMAND ${TOOLCHAIN_LINKER} -r -b binary -o ${FONT_O_PATH} font.sfn
+        DEPENDS ${FONT_PATH}
+)
+add_custom_target(font ALL DEPENDS ${FONT_PATH})
 
 # generate multiboot-compliant kernel file
 set(MULTIBOOT_OUTPUT_PATH ${CMAKE_BINARY_DIR}/tos.bin)
@@ -23,14 +35,14 @@ add_custom_command(
 
         # link the kernel
         COMMAND echo "Linking $<TARGET_OBJECTS:boot> $<TARGET_OBJECTS:kernel> into a kernel file"
-        COMMAND ${CMAKE_C_COMPILER} -T ${PROJECT_SOURCE_DIR}/kernel/linker.ld -o ${MULTIBOOT_OUTPUT_PATH} -ffreestanding -nostdlib $<TARGET_OBJECTS:boot> $<TARGET_OBJECTS:kernel> -lgcc
+        COMMAND ${CMAKE_C_COMPILER} -T ${PROJECT_SOURCE_DIR}/kernel/linker.ld -o ${MULTIBOOT_OUTPUT_PATH} -ffreestanding -nostdlib $<TARGET_OBJECTS:boot> $<TARGET_OBJECTS:kernel> ${FONT_O_PATH} -lgcc
         # create grub image
         COMMAND mkdir -p ${ISO_TMP_DIR}/boot/grub
         COMMAND cp ${MULTIBOOT_OUTPUT_PATH} ${ISO_TMP_DIR}/boot/
         COMMAND cp ${PROJECT_SOURCE_DIR}/kernel/grub.cfg ${ISO_TMP_DIR}/boot/grub/grub.cfg
         COMMAND grub-mkrescue -o ${ISO_PATH} ${ISO_TMP_DIR}
 
-        DEPENDS boot kernel ${PROJECT_SOURCE_DIR}/kernel/linker.ld ${PROJECT_SOURCE_DIR}/kernel/grub.cfg $<TARGET_OBJECTS:boot> $<TARGET_OBJECTS:kernel>
+        DEPENDS boot kernel ${PROJECT_SOURCE_DIR}/kernel/linker.ld ${PROJECT_SOURCE_DIR}/kernel/grub.cfg $<TARGET_OBJECTS:boot> $<TARGET_OBJECTS:kernel> font ${FONT_O_PATH}
 
         COMMAND_EXPAND_LISTS
 )
