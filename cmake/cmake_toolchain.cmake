@@ -4,6 +4,7 @@ set(CMAKE_SYSTEM_PROCESSOR i686-elf)
 set(prefix /mnt/e/toolchains/install-i686-elf/)
 set(CMAKE_C_COMPILER ${prefix}/bin/i686-elf-gcc)
 set(CMAKE_CXX_COMPILER ${prefix}/bin/i686-elf-g++)
+set(TOOLCHAIN_LINKER ${prefix}/bin/i686-elf-ld CACHE PATH "Path to the toolchain linker" FORCE)
 
 set(CMAKE_C_COMPILER_WORKS 1)
 set(CMAKE_CXX_COMPILER_WORKS 1)
