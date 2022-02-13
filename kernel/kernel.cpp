@@ -4,6 +4,8 @@
 #include "gdt.h"
 #include "idt.h"
 #include "kpanic.h"
+#include "memory.h"
+#include "paging.h"
 #include "pit.h"
 
 extern "C" void kmain(unsigned long addr) {
@@ -20,6 +22,11 @@ extern "C" void kmain(unsigned long addr) {
   init_idt();
   // set interval timer
   init_pit_timer(1);
+
+  /// 4. initialize memory related components
+  // kmalloc
+  init_kmalloc();
+  init_paging();
 
   /// put anything that requires interrupts being turn off above this line
   enable_interrupt();
