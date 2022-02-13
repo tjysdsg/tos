@@ -29,7 +29,9 @@
 
 #define PIC_EOI 0x20 // End-of-interrupt command code
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 void init_interrupt_handlers();
 
@@ -95,6 +97,8 @@ void irq_handler(registers_t regs);
 typedef void (*isr_t)(registers_t);
 void register_interrupt_handler(uint8_t n, isr_t handler);
 
+#ifdef __cplusplus
 }
+#endif
 
 #endif //TOS_KERNEL_ISR_H

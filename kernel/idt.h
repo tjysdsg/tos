@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// https://wiki.osdev.org/Interrupt_Descriptor_Table
 struct idt_entry_t {
   uint16_t offset_low;        // offset bits 0..15
@@ -25,5 +29,10 @@ struct idtr_t {
 void init_idt();
 void enable_interrupt();
 
-extern "C" void flush_idt(uint32_t idtr);
+extern void flush_idt(uint32_t idtr);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif //TOS_KERNEL_IDT_H

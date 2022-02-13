@@ -14,7 +14,7 @@ add_library(kernel OBJECT
         kernel/tty.c
         kernel/idt.cpp
         kernel/isr.cpp
-        )
+        kernel/paging.cpp kernel/paging.h)
 target_compile_options(kernel PRIVATE -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -O2)
 
 # prepare ssfn font file for linking with the kernel
