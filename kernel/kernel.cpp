@@ -6,29 +6,23 @@
 #include "kpanic.h"
 #include "pit.h"
 
-extern uint8_t _kernel_seg_end;
-
 extern "C" void kmain(unsigned long addr) {
   auto *mbi = (multiboot_info_t *) addr;
 
+  /// 1. must be the first thing that is called, since even kpanic relies on printing to console
   init_tty(mbi);
   clear_screen();
 
+  /// 2. check if gdt is initialized before kmain is called, in gdt.asm
   kassert(gdt_initialized, "GDT is not initialized");
 
+  /// 3. initialize interrupts
   init_idt();
+  // set interval timer
   init_pit_timer(1);
 
+  /// put anything that requires interrupts being turn off above this line
   enable_interrupt();
-
-  { // find kernel memory start address, align by 4KB
-    auto kernel_seg_end = (uint32_t) &_kernel_seg_end;
-    uint32_t remain = kernel_seg_end % 4096;
-    uint32_t fill = 4096 - remain;
-    kernel_seg_end += fill;
-    kassert(kernel_seg_end % 4096 == 0, "Cannot find kernel memory starting address");
-    kprintf("Kernel memory start = 0x%x\n", kernel_seg_end);
-  }
 
   // test IDT
   /*
@@ -37,7 +31,7 @@ extern "C" void kmain(unsigned long addr) {
   asm volatile ("int $33"); // IRQ
   */
 
-  /// 2. Print multiboot header and multiboot information
+  /// 4. Print multiboot header and multiboot information
   kprintf("multiboot header:\n");
   kprintf("  flags = 0x%x\n", multiboot_header.flags);
   kprintf("  header_addr = 0x%x\n", multiboot_header.header_addr);
