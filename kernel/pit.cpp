@@ -7,7 +7,7 @@ static uint32_t tick = 0;
 
 static void timer_callback(registers_t regs) {
   tick++;
-  kprintf("Tick: %d\n", tick);
+  // kprintf("Tick: %d\n", tick);
 }
 
 // https://wiki.osdev.org/Programmable_Interval_Timer
