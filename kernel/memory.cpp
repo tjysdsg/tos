@@ -42,7 +42,8 @@ uint32_t kmalloc_page_align(uint32_t size) {
 void *kmemset(void *ptr, int c, uint32_t n) {
   auto *p = (uint8_t *) ptr;
   for (uint32_t i = 0; i < n; ++i) {
-    *(p++) = c;
+    *p = c;
+    ++p;
   }
   return ptr;
 }
