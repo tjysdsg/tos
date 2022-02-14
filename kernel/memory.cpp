@@ -14,8 +14,8 @@ static uint32_t kernel_free_mem = 0; /// current starting address of free memory
 static heap_t *heap;
 
 /// https://wiki.osdev.org/Exceptions#General_Protection_Fault
-static void general_protection_fault_handler(registers_t regs) {
-  kprintf("General protection fault, segment selector index = 0x%x\n", regs.err_code);
+static void general_protection_fault_handler(registers_t *regs) {
+  kprintf("General protection fault, segment selector index = 0x%x\n", regs->err_code);
   kpanic("See above");
 }
 

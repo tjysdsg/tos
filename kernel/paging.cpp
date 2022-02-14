@@ -8,17 +8,17 @@
 extern "C" void load_page_directory(uint32_t page_directory);
 extern "C" void enable_paging();
 
-static void page_fault(registers_t regs) {
+static void page_fault(registers_t *regs) {
   // the faulting address is stored in the CR2 register.
   uint32_t faulting_address;
   asm volatile("mov %%cr2, %0" : "=r" (faulting_address));
 
   // The error code gives us details of what happened.
-  int present = !(regs.err_code & 0x1); // Page not present
-  int rw = regs.err_code & 0x2;         // Write operation?
-  int us = regs.err_code & 0x4;         // Processor was in user-mode?
-  int reserved = regs.err_code & 0x8;   // Overwritten CPU-reserved bits of page entry?
-  int id = regs.err_code & 0x10;        // Caused by an instruction fetch?
+  int present = !(regs->err_code & 0x1); // Page not present
+  int rw = regs->err_code & 0x2;         // Write operation?
+  int us = regs->err_code & 0x4;         // Processor was in user-mode?
+  int reserved = regs->err_code & 0x8;   // Overwritten CPU-reserved bits of page entry?
+  int id = regs->err_code & 0x10;        // Caused by an instruction fetch?
 
   // Output an error message.
   kprintf("Page fault. Address: 0x%x. Error reason: ", faulting_address);
