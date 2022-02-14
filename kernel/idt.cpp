@@ -10,8 +10,9 @@
 #define IDT_32BIT_TRAP_GATE     0xF
 
 #define IDT_PRESENT_BIT         0b10000000
-#define IDT_RING_0              0b00000000
-#define DEFAULT_IDT_FLAG        (IDT_PRESENT_BIT | IDT_RING_0 | IDT_32BIT_INT_GATE)
+// allow user mode interrupt
+#define IDT_RING_3              0b01100000
+#define DEFAULT_IDT_FLAG        (IDT_PRESENT_BIT | IDT_RING_3 | IDT_32BIT_INT_GATE)
 
 idt_entry_t idt_entries[256]{};
 idtr_t idtr{};
