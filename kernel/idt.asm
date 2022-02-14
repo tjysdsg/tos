@@ -14,6 +14,7 @@ isr%1:
     push byte 0
     push byte %1
     pushad ; edi,esi,ebp,esp,ebx,edx,ecx,eax
+    cld
     call isr_handler
     popad
 
@@ -28,6 +29,7 @@ isr%1:
     cli
     push byte %1
     pushad ; edi,esi,ebp,esp,ebx,edx,ecx,eax
+    cld
     call isr_handler
     popad
 
@@ -47,6 +49,7 @@ isr%1:
     push byte 0
     push byte %2
     pushad ; edi,esi,ebp,esp,ebx,edx,ecx,eax
+    cld
     call irq_handler
     popad
 
