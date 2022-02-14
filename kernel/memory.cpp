@@ -2,12 +2,19 @@
 #include "kpanic.h"
 #include "memory.h"
 #include "kprintf.h"
+#include "isr.h"
 
 extern uint8_t _kernel_seg_end; /// see linker.ld
 static uint32_t kernel_mem_start = 0;
 static uint32_t kernel_free_mem = 0; /// current starting address of free memory
 
-void init_kmalloc() { // find kernel memory start address, align by 4KB
+/// https://wiki.osdev.org/Exceptions#General_Protection_Fault
+static void general_protection_fault_handler(registers_t regs) {
+  kprintf("General protection fault, segment selector index = 0x%x\n", regs.err_code);
+  kpanic("See above");
+}
+
+void init_memory() { // find kernel memory start address, align by 4KB
   kernel_mem_start = (uint32_t) &(_kernel_seg_end);
   kernel_mem_start += 0x1000; // reserve some space to be safe
 
@@ -20,6 +27,9 @@ void init_kmalloc() { // find kernel memory start address, align by 4KB
 
   kprintf("Kernel memory start = 0x%x\n", kernel_mem_start);
   kernel_free_mem = kernel_mem_start;
+
+  /// register memory-related interrupt handler
+  register_interrupt_handler(13, general_protection_fault_handler);
 }
 
 uint32_t kmalloc_page_align(uint32_t size) {

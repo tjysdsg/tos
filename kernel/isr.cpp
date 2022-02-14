@@ -11,8 +11,10 @@ void init_interrupt_handlers() {
 }
 
 void isr_handler(registers_t regs) {
-  kprintf("Recieved interrupt: %d\n", regs.int_no);
-  kprintf("Errno: %d\n", regs.err_code);
+  isr_t handler = interrupt_handlers[regs.int_no];
+  kprintf("Receiving INT %d, handler at: 0x%x\n", regs.int_no, handler);
+  if (handler)
+    handler(regs);
 }
 
 void register_interrupt_handler(uint8_t n, isr_t handler) {

@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-void init_kmalloc();
+void init_memory();
 
 /**
  * @brief Get a 4KB-aligned free memory address

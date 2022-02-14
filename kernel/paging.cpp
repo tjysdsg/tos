@@ -21,12 +21,14 @@ static void page_fault(registers_t regs) {
   int id = regs.err_code & 0x10;        // Caused by an instruction fetch?
 
   // Output an error message.
-  kprintf("Page fault at 0x%x. Error reason:\n", faulting_address);
-  if (present) { kprintf("present\n"); }
+  kprintf("Page fault at 0x%x. Error reason: ", faulting_address);
+  if (present) { kprintf("not present\n"); }
   if (rw) { kprintf("read-only\n"); }
   if (us) { kprintf("user-mode\n"); }
   if (id) { kprintf("inst-fetch\n"); }
   if (reserved) { kprintf("reserved\n"); }
+
+  kpanic("See above");
 }
 
 void init_paging() {
@@ -40,7 +42,7 @@ void init_paging() {
 
   /// create an identity map of the entire 4GB physical memory, used by kernel
   uint32_t addr = 0;
-  for (int tab_i = 0; tab_i < 1024; ++tab_i) {
+  for (int tab_i = 0; tab_i < 1020; ++tab_i) {
     // write enabled, present
     kernel_page_directory->entries[tab_i].rw = 1;
     kernel_page_directory->entries[tab_i].present = 1;

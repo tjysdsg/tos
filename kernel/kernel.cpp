@@ -24,12 +24,16 @@ extern "C" void kmain(unsigned long addr) {
   init_pit_timer(1);
 
   /// 4. initialize memory related components
-  // kmalloc
-  init_kmalloc();
+  init_memory();
   init_paging();
 
   /// put anything that requires interrupts being turn off above this line
   enable_interrupt();
+
+  // test page fault handler
+  auto *ptr = (uint32_t *) 0xFFFFFFFF;
+  uint32_t do_page_fault = *ptr;
+  kprintf("%d\n", do_page_fault);
 
   // test IDT
   /*
