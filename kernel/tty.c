@@ -5,11 +5,10 @@
 #define SSFN_CONSOLEBITMAP_TRUECOLOR
 // fix errors in ssfn.h using these macros
 #define _STDINT_H
-#define NULL 0
 #include <scalable-font2/ssfn.h>
 
-static int xpos;
-static int ypos;
+static uint32_t xpos;
+static uint32_t ypos;
 static uint32_t terminal_height = 0;
 static uint32_t terminal_width = 0;
 static uint32_t terminal_bpp = 0;
@@ -99,7 +98,7 @@ void putchar(char c) {
 /// Clear the screen and initialize VIDEO, XPOS and YPOS
 void clear_screen() {
   if (vidoe_mode == VIDEO_MODE_VGA) {
-    for (int i = 0; i < terminal_width * terminal_height * 2; i++)
+    for (uint32_t i = 0; i < terminal_width * terminal_height * 2; i++)
       *(video + i) = 0;
 
     xpos = 0;

@@ -77,10 +77,10 @@ extern "C" void kmain(unsigned long addr) {
 
   // mods_*
   if (CHECK_FLAG(mbi->flags, 3)) {
-    multiboot_module_t *mod;
-    int i;
-
     kprintf("  mods_count = %d, mods_addr = 0x%x\n", (int) mbi->mods_count, (int) mbi->mods_addr);
+
+    uint32_t i;
+    multiboot_module_t *mod;
     for (i = 0, mod = (multiboot_module_t *) mbi->mods_addr; i < mbi->mods_count; i++, mod++)
       kprintf(
           "    mod_start = 0x%x, mod_end = 0x%x, cmdline = %s\n",
