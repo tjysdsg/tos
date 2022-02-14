@@ -1,11 +1,25 @@
 #ifndef TOS_KERNEL_MEMORY_H
 #define TOS_KERNEL_MEMORY_H
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+typedef struct memory_block_header {
+  memory_block_header *prev;
+  uint32_t size; /// size of a memory block, not including the header
+  uint8_t used;
+} memory_block_header_t;
+
+typedef struct {
+  /// the entire heap spans the range [start_addr, end_addr)
+  uint32_t start_addr; /// start of heap (the first header)
+  uint32_t end_addr;   /// current end of heap
+} heap_t;
+
 void init_memory();
+void init_heap();
 
 /**
  * @brief Get a 4KB-aligned free memory address
@@ -14,8 +28,10 @@ void init_memory();
  */
 uint32_t kmalloc_page_align(uint32_t size);
 
-/// https://man7.org/linux/man-pages/man3/memset.3.html
 void *kmemset(void *ptr, int c, uint32_t n);
+
+void *malloc(uint32_t size);
+void free(void *ptr);
 
 #ifdef __cplusplus
 }

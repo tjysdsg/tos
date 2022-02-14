@@ -21,7 +21,7 @@ static void page_fault(registers_t regs) {
   int id = regs.err_code & 0x10;        // Caused by an instruction fetch?
 
   // Output an error message.
-  kprintf("Page fault at 0x%x. Error reason: ", faulting_address);
+  kprintf("Page fault. Address: 0x%x. Error reason: ", faulting_address);
   if (present) { kprintf("not present\n"); }
   if (rw) { kprintf("read-only\n"); }
   if (us) { kprintf("user-mode\n"); }

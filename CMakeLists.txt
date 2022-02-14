@@ -1,7 +1,16 @@
 cmake_minimum_required(VERSION 3.16)
 project(tos C CXX ASM_NASM)
 
-include_directories(thirdparty)
+option(ENABLE_TESTS "Enable tests" ON)
+
+include_directories(thirdparty test .)
+
+add_subdirectory(test)
+message(STATUS "Kernel test sources ${KERNEL_TEST_SOURCES}")
+
+if (${ENABLE_TESTS})
+    enable_tests()
+endif ()
 
 add_library(
         boot OBJECT
@@ -24,6 +33,8 @@ add_library(
         kernel/isr.cpp
         kernel/paging.cpp
         kernel/memory.cpp
+
+        ${KERNEL_TEST_SOURCES}
 )
 target_compile_options(kernel PRIVATE -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -O2)
 

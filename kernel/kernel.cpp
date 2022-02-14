@@ -7,6 +7,7 @@
 #include "memory.h"
 #include "paging.h"
 #include "pit.h"
+#include "kernel_test.h"
 
 extern "C" void kmain(unsigned long addr) {
   auto *mbi = (multiboot_info_t *) addr;
@@ -26,6 +27,7 @@ extern "C" void kmain(unsigned long addr) {
   /// 4. initialize memory related components
   init_memory();
   init_paging();
+  init_heap();
 
   /// put anything that requires interrupts being turn off above this line
   enable_interrupt();
@@ -129,4 +131,8 @@ extern "C" void kmain(unsigned long addr) {
           (unsigned) mmap->type
       );
   }
+
+  #ifdef __TOS_ENABLE_KERNEL_TESTS__
+  run_kernel_tests();
+  #endif
 }
