@@ -5,12 +5,12 @@ flush_idt:
    lidt [eax]
    ret
 
+; cli and sti are not required in interrupt handlers
 
 ; interrupt service routines
 %macro ISR_NOERR_HANDLER 1  ; 0 as error code (cuz there's no error)
     [GLOBAL isr%1]
 isr%1:
-    cli
     push byte 0
     push byte %1
     pushad ; edi,esi,ebp,esp,ebx,edx,ecx,eax
@@ -19,14 +19,12 @@ isr%1:
     popad
 
     add esp, 8
-    sti
     iret
 %endmacro
 
 %macro ISR_ERR_HANDLER 1 ; error code is already set by CPU
     [GLOBAL isr%1]
 isr%1:
-    cli
     push byte %1
     pushad ; edi,esi,ebp,esp,ebx,edx,ecx,eax
     cld
@@ -34,7 +32,6 @@ isr%1:
     popad
 
     add esp, 8
-    sti
     iret
 %endmacro
 
@@ -45,7 +42,6 @@ isr%1:
 %macro IRQ 2
   global irq%1
   irq%1:
-    cli
     push byte 0
     push byte %2
     pushad ; edi,esi,ebp,esp,ebx,edx,ecx,eax
@@ -54,7 +50,6 @@ isr%1:
     popad
 
     add esp, 8
-    sti
     iret
 %endmacro
 
