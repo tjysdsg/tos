@@ -86,9 +86,12 @@ void irq14();
 void irq15();
 
 struct registers_t {
-  uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; // pushed by pushad
-  uint32_t int_no, err_code;                       // interrupt number and error code (if applicable)
-  uint32_t eip, cs, eflags;                        // pushed by the processor automatically
+  uint32_t edi, esi, ebp, useless, ebx, edx, ecx, eax; // pushed by pushad
+  uint32_t int_no;   // interrupt number
+  uint32_t err_code; // error code. 0 is manually pushed if there is no error (idt.asm)
+  uint32_t eip, cs, eflags, esp, ss; /* pushed by the processor automatically
+                                      * esp and ss is only pushed when CPU privilege change occurred
+                                      */
 };
 
 void isr_handler(registers_t regs);
