@@ -33,6 +33,18 @@ void *kmemset(void *ptr, int c, uint32_t n);
 void *malloc(uint32_t size);
 void free(void *ptr);
 
+/**
+ * @brief Get header of the memory block referred by a pointer
+ * @param ptr The start of the memory block (not the header)
+ */
+memory_block_header_t *block_header_from_addr(void *ptr);
+
+/**
+ * @brief Find the next block header
+ * @return nullptr if header is already the last header on heap
+ */
+memory_block_header_t *next_header(memory_block_header_t *header);
+
 #ifdef __cplusplus
 }
 #endif

@@ -62,9 +62,6 @@ uint32_t kmalloc_page_align(uint32_t size) {
 
   uint32_t ret = kernel_free_mem;
   kernel_free_mem += size;
-  // kprintf("kmalloc size: 0x%x\n", size);
-  // kprintf("kmalloc ret: 0x%x\n", ret);
-  // kprintf("kmalloc new kernel_free_mem: 0x%x\n", kernel_free_mem);
   return ret;
 }
 
@@ -107,11 +104,7 @@ static void *reuse_memory_block(uint32_t addr) {
   return (void *) (addr + MEMORY_HEADER_SIZE);
 }
 
-/**
- * @brief Get header of the memory block referred by a pointer
- * @param ptr The start of the memory block (not the header)
- */
-static memory_block_header_t *block_header_from_addr(void *ptr) {
+memory_block_header_t *block_header_from_addr(void *ptr) {
   uint32_t addr = (uint32_t) ptr;
   kassert(addr >= MEMORY_HEADER_SIZE, "Invalid pointer");
   return (memory_block_header_t *) (addr - MEMORY_HEADER_SIZE);
@@ -140,7 +133,7 @@ void *malloc(uint32_t size) {
   while (addr < heap->end_addr) {
     header = (memory_block_header_t *) addr;
     // reuse the free block
-    if (header->size >= size && !header->used) {
+    if (!header->used && header->size >= size) {
       // if there is available space for a new block and its header, split this block
       if (header->size >= size + MEMORY_HEADER_SIZE + MIN_MEMORY_SPLIT_THRESHOLD) {
         uint32_t extra_size = header->size - size - MEMORY_HEADER_SIZE;
@@ -149,7 +142,7 @@ void *malloc(uint32_t size) {
         ret = new_memory_block(header->prev, addr, size);
 
         uint32_t new_addr = (uint32_t) ret + size;
-        new_memory_block(header, new_addr, extra_size);
+        new_memory_block(header, new_addr, extra_size, false);
       } else {
         // otherwise just reuse this block
         ret = reuse_memory_block(addr);
@@ -158,7 +151,7 @@ void *malloc(uint32_t size) {
     }
 
     kassert(header->size, "Invalid memory block header");
-    addr += header->size;
+    addr += header->size + MEMORY_HEADER_SIZE;
   }
 
   if (!ret) { // no existing free memory block can be reused
@@ -176,11 +169,18 @@ void free(void *ptr) {
   if (other)
     merge_blocks_if_possible(other, header);
 
-  uint32_t next_addr = (uint32_t) header + MEMORY_HEADER_SIZE + header->size;
-  if (next_addr < heap->end_addr) {
-    other = (memory_block_header_t *) (next_addr);
+  other = next_header(header);
+  if (other) {
     merge_blocks_if_possible(header, other);
   }
 
   // heap.end_addr doesn't need to be reduced
+}
+
+memory_block_header_t *next_header(memory_block_header_t *header) {
+  uint32_t next_addr = (uint32_t) header + MEMORY_HEADER_SIZE + header->size;
+  if (next_addr < heap->end_addr) {
+    return (memory_block_header_t *) (next_addr);
+  }
+  return nullptr;
 }
