@@ -41,8 +41,16 @@ extern kmain                 ; see kernel.cpp
 
 start:
   cli  ; disable interrupts until IDT is loaded
+  mov  esp, stack_end  ; custom stack
+
   call load_gdt
 
   push    ebx                  ; Load multiboot header location
   call kmain                   ; call our main() function
   jmp $
+
+SECTION .bss
+
+stack_begin:
+    resb 0x1000000  ; 1MB for stack
+stack_end:
