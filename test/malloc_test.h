@@ -9,6 +9,7 @@ void malloc_test() {
   /// 1. basic malloc()ing
   uint32_t size = 100;
   uint8_t *a = (uint8_t *) malloc(size);
+  memory_block_header_t *header_a = block_header_from_addr(a);
   {
     kassert(a, "malloc() returns nullptr");
     for (uint32_t i = 0; i < size; ++i) {
@@ -17,9 +18,8 @@ void malloc_test() {
     free(a);
 
     // now there should be a big unused block
-    memory_block_header_t *header = block_header_from_addr(a);
-    kassert(header->size == size, "Wrong block size");
-    kassert(header->used == 0, "Should be a free block");
+    kassert(header_a->size == size, "Wrong block size");
+    kassert(header_a->used == 0, "Should be a free block");
   }
 
   /// 2. reusing the previous block
@@ -38,6 +38,14 @@ void malloc_test() {
     kassert(header_c->size == sub_size, "Wrong block size for c");
     // kprintf("header_b=0x%x, header_c=0x%x\n", header_b, header_c);
     kassert(header_c->prev == header_b, "Headers of b and c should be consecutive");
+
+    free(b);
+    kassert(header_b->used == 0, "Failed to free memory");
+    kassert(header_c->used == 1, "Memory should be marked as used");
+
+    free(c);
+    kassert(header_a->size == size, "Free block should be merged");
+    kassert(header_a->used == 0, "Should be a free block");
   }
 
   kprintf("malloc() tests passed\n");

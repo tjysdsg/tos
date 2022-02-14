@@ -123,6 +123,7 @@ static memory_block_header_t *merge_blocks_if_possible(memory_block_header_t *pr
   if (next->prev == prev) {
     prev->size += next->size + MEMORY_HEADER_SIZE;
   }
+  return prev;
 }
 
 void *malloc(uint32_t size) {
