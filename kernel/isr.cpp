@@ -12,7 +12,7 @@ void init_interrupt_handlers() {
 
 void isr_handler(registers_t regs) {
   isr_t handler = interrupt_handlers[regs.int_no];
-  kprintf("Receiving INT %d, handler at: 0x%x\n", regs.int_no, handler);
+  kprintf("Receiving INT %d, error code: 0x%x handler at: 0x%x\n", regs.int_no, regs.err_code, handler);
   if (handler)
     handler(regs);
 }

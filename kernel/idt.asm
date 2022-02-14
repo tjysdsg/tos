@@ -11,8 +11,8 @@ flush_idt:
 %macro ISR_NOERR_HANDLER 1  ; 0 as error code (cuz there's no error)
     [GLOBAL isr%1]
 isr%1:
-    push byte 0
-    push byte %1
+    push dword 0
+    push dword %1
     pushad ; edi,esi,ebp,esp,ebx,edx,ecx,eax
     cld
     call isr_handler
@@ -25,7 +25,7 @@ isr%1:
 %macro ISR_ERR_HANDLER 1 ; error code is already set by CPU
     [GLOBAL isr%1]
 isr%1:
-    push byte %1
+    push dword %1
     pushad ; edi,esi,ebp,esp,ebx,edx,ecx,eax
     cld
     call isr_handler
@@ -42,8 +42,8 @@ isr%1:
 %macro IRQ 2
   global irq%1
   irq%1:
-    push byte 0
-    push byte %2
+    push dword 0
+    push dword %2
     pushad ; edi,esi,ebp,esp,ebx,edx,ecx,eax
     cld
     call irq_handler
