@@ -31,9 +31,11 @@ extern "C" void kmain(unsigned long addr) {
   enable_interrupt();
 
   // test page fault handler
+  /*
   auto *ptr = (uint32_t *) 0xFFFFFFFF;
   uint32_t do_page_fault = *ptr;
   kprintf("%d\n", do_page_fault);
+  */
 
   // test IDT
   /*

@@ -42,7 +42,7 @@ void init_paging() {
 
   /// create an identity map of the entire 4GB physical memory, used by kernel
   uint32_t addr = 0;
-  for (int tab_i = 0; tab_i < 1020; ++tab_i) {
+  for (int tab_i = 0; tab_i < 1024; ++tab_i) {
     // write enabled, present
     kernel_page_directory->entries[tab_i].rw = 1;
     kernel_page_directory->entries[tab_i].present = 1;
