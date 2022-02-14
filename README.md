@@ -1,0 +1,3 @@
+- Paging with PAE
+- Long mode
+- APIC
