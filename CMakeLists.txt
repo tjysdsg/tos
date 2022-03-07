@@ -33,6 +33,7 @@ add_library(
         kernel/isr.cpp
         kernel/paging.cpp
         kernel/memory.cpp
+        kernel/pic.cpp
 
         ${KERNEL_TEST_SOURCES}
 )

@@ -2,6 +2,7 @@
 #include "tty.h"
 #include "kprintf.h"
 #include "gdt.h"
+#include "pic.h"
 #include "idt.h"
 #include "kpanic.h"
 #include "memory.h"
@@ -19,7 +20,9 @@ extern "C" void kmain(unsigned long addr) {
   /// 2. check if gdt is initialized before kmain is called, in gdt.asm
   kassert(gdt_initialized, "GDT is not initialized");
 
-  /// 3. initialize interrupts
+  /// 3. initialize APIC and interrupt handlers
+  remap_pic();
+  init_apic(); // this will disable the 8259 pic
   init_idt();
   // set interval timer
   init_pit_timer(1);
@@ -29,7 +32,7 @@ extern "C" void kmain(unsigned long addr) {
   init_paging();
   init_heap();
 
-  /// put anything that requires interrupts being turn off above this line
+  /// 5. Enable interrupts
   enable_interrupt();
 
   // test page fault handler
@@ -46,7 +49,7 @@ extern "C" void kmain(unsigned long addr) {
   asm volatile ("int $33"); // IRQ
   */
 
-  /// 4. Print multiboot header and multiboot information
+  /// 6. Print multiboot header and multiboot information
   kprintf("multiboot header:\n");
   kprintf("  flags = 0x%x\n", multiboot_header.flags);
   kprintf("  header_addr = 0x%x\n", multiboot_header.header_addr);

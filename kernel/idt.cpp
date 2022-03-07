@@ -2,7 +2,6 @@
 #include "isr.h"
 #include "gdt.h"
 #include "kprintf.h"
-#include "port.h"
 #include <stdint.h>
 
 #define IDT_TASK_GATE           0x5
@@ -27,20 +26,6 @@ void create_idt_entry(idt_entry_t *entry, uint32_t offset, uint16_t selector, ui
 
 void init_idt() {
   static_assert(sizeof(idt_entry_t) == 8);
-
-  // init PIC
-  // TODO: use APIC
-  // remap IRQ 0-15 to 32-47, since 0-31 is reserved for exceptions/faults
-  outb(0x20, 0x11);
-  outb(0xA0, 0x11);
-  outb(0x21, 0x20);
-  outb(0xA1, 0x28);
-  outb(0x21, 0x04);
-  outb(0xA1, 0x02);
-  outb(0x21, 0x01);
-  outb(0xA1, 0x01);
-  outb(0x21, 0x0);
-  outb(0xA1, 0x0);
 
   create_idt_entry(&idt_entries[0], (uint32_t) isr0, gdt_code_seg_selector, DEFAULT_IDT_FLAG);
   create_idt_entry(&idt_entries[1], (uint32_t) isr1, gdt_code_seg_selector, DEFAULT_IDT_FLAG);

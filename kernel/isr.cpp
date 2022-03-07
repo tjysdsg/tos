@@ -22,6 +22,8 @@ void register_interrupt_handler(uint8_t n, isr_t handler) {
 }
 
 void irq_handler(registers_t regs) {
+  // TODO: use APIC
+
   // send End-Of-Interrupt signal to PIC if the interrupt involves the slave
   if (regs.int_no >= IRQ8) {
     // reset slave
