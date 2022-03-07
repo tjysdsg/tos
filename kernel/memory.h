@@ -8,8 +8,8 @@ extern "C" {
 
 typedef struct memory_block_header {
   memory_block_header *prev;
-  uint32_t size; /// size of a memory block, not including the header
-  uint8_t used;
+  uint32_t size: 31; /// size of a memory block, not including the header
+  uint32_t used: 1;
 } memory_block_header_t;
 
 typedef struct {
