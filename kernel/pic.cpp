@@ -6,6 +6,14 @@
 
 static uint32_t APIC_BASE_ADDR = 0xFEE00000;
 
+uint32_t read_apic_register(uint32_t offset) {
+  return *(uint32_t *) (APIC_BASE_ADDR + offset);
+}
+
+void write_apic_register(uint32_t offset, uint32_t val) {
+  *(uint32_t *) (APIC_BASE_ADDR + offset) = val;
+}
+
 static uint32_t init_x2apic() {
   // check V2 Extended Topology Enumeration Leaf, Intel IA manual Vol. 2A 3-232
   uint32_t eax = 0x1F, ebx = 0, ecx = 0, edx = 0;
@@ -23,7 +31,23 @@ static void enable_apic() {
   // developer should have already checked if APIC is enabled by using CPUID.1H
   kassert((apic_base_msr >> 11) & 0x1, "APIC should be present on chip");
 
+  // software-enable APIC using the spurious vector register, 10-34 Vol. 3A
+  // 0xFF used according to https://wiki.osdev.org/APIC
+  write_apic_register(APIC_REG_SVR, 0xFF | 0x100);
+
   kprintf("Found and enabled APIC, APIC address is 0x%x\n", APIC_BASE_ADDR);
+
+  // disable logical interrupts
+  // TODO: why xv6 does this?
+  write_apic_register(APIC_REG_LINT0, 0x10000);
+  write_apic_register(APIC_REG_LINT1, 0x10000);
+
+  // clear error status
+  write_apic_register(APIC_REG_ESR, 0);
+  // clear unfinished interrupt
+  write_apic_register(APIC_REG_EOI, 0);
+  // accept all level of interrupts
+  write_apic_register(APIC_REG_TPR, 0);
 }
 
 void init_apic() {
@@ -48,9 +72,10 @@ void init_apic() {
     has_apic = (edx >> 9) & 0x1;
   }
 
-  if (has_apic)
+  if (has_apic) {
     enable_apic();
-  else if (has_x2apic) {
+    kassert(read_apic_register(0x20) == lapic_id, "Inconsistency between the local APIC ID from CPUID and MSR");
+  } else if (has_x2apic) {
     lapic_id = init_x2apic();
     kprintf("x2apic supported, id = %d\n", lapic_id);
     // TODO: implement x2APIC
@@ -76,4 +101,8 @@ void remap_pic() {
 void disable_pic() {
   outb(0x21, 0xFF);
   outb(0xA1, 0xFF);
+}
+
+void send_eoi() {
+  write_apic_register(APIC_REG_EOI, 0);
 }

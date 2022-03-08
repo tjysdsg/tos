@@ -20,15 +20,6 @@
 #define IRQ14 46
 #define IRQ15 47
 
-#define PIC1 0x20 // address for master PIC
-#define PIC2 0xA0 // address for slave PIC
-#define PIC1_COMMAND    PIC1
-#define PIC1_DATA    (PIC1+1)
-#define PIC2_COMMAND    PIC2
-#define PIC2_DATA    (PIC2+1)
-
-#define PIC_EOI 0x20 // End-of-interrupt command code
-
 #ifdef __cplusplus
 extern "C" {
 #endif
