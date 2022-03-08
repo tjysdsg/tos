@@ -37,8 +37,9 @@ static void enable_apic() {
 
   kprintf("Found and enabled APIC, APIC address is 0x%x\n", APIC_BASE_ADDR);
 
-  // disable logical interrupts
-  // TODO: why xv6 does this?
+  // mask LINT0 and LINT1
+  // typically in MP systems, the LINT0 and LINT1 pins are not used to deliver interrupts to the logical processors
+  // 8-32 Vol. 3A
   write_apic_register(APIC_REG_LINT0, 0x10000);
   write_apic_register(APIC_REG_LINT1, 0x10000);
 

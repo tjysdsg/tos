@@ -35,20 +35,6 @@ extern "C" void kmain(unsigned long addr) {
   /// 5. Enable interrupts
   enable_interrupt();
 
-  // test page fault handler
-  /*
-  auto *ptr = (uint32_t *) 0xFFFFFFFF;
-  uint32_t do_page_fault = *ptr;
-  kprintf("%d\n", do_page_fault);
-  */
-
-  // test IDT
-  /*
-  asm volatile ("int $3");
-  asm volatile ("int $10");
-  asm volatile ("int $33"); // IRQ
-  */
-
   /// 6. Print multiboot header and multiboot information
   kprintf("multiboot header:\n");
   kprintf("  flags = 0x%x\n", multiboot_header.flags);
