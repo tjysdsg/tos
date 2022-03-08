@@ -22,7 +22,7 @@ extern "C" void kmain(unsigned long addr) {
 
   /// 3. initialize APIC and interrupt handlers
   remap_pic();
-  init_apic(); // this will disable the 8259 pic
+  init_apic();
   init_idt();
   // set interval timer
   init_pit_timer(1);

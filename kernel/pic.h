@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Init advanced programmable interrupt controller if supported
+ * @brief Init advanced programmable interrupt controller if supported, this will disable the 8259 pic
  * @details Prefer x2APIC over APIC
  */
 void init_apic();
