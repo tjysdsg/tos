@@ -185,3 +185,17 @@ memory_block_header_t *next_header(memory_block_header_t *header) {
   }
   return nullptr;
 }
+
+void *operator new(size_t sz) {
+  if (sz == 0)
+    kpanic("Bad alloc, size cannot be 0");
+
+  if (void *ptr = malloc(sz))
+    return ptr;
+
+  kpanic("Bad alloc");
+}
+
+void operator delete(void *ptr) noexcept {
+  free(ptr);
+}

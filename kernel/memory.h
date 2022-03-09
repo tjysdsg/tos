@@ -1,6 +1,7 @@
 #ifndef TOS_KERNEL_MEMORY_H
 #define TOS_KERNEL_MEMORY_H
 #include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,6 +48,12 @@ memory_block_header_t *next_header(memory_block_header_t *header);
 
 #ifdef __cplusplus
 }
+
+/// Overloading new and delete operators
+
+void *operator new(size_t sz);
+void operator delete(void *ptr) noexcept;
+
 #endif
 
 #endif //TOS_KERNEL_MEMORY_H

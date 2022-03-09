@@ -5,6 +5,13 @@
 #include "kernel/memory.h"
 #include "kernel/kprintf.h"
 
+class TestStruct {
+ public:
+  int x = 0;
+  int y = 0;
+  TestStruct(int _x, int _y) : x(_x), y(_y) {}
+};
+
 void malloc_test() {
   /// 1. basic malloc()ing
   uint32_t size = 100;
@@ -46,6 +53,16 @@ void malloc_test() {
     free(c);
     kassert(header_a->size == size, "Free block should be merged");
     kassert(header_a->used == 0, "Should be a free block");
+  }
+
+  /// 3. new() and delete()
+  {
+    int x = 1, y = 2;
+    TestStruct *ts = new TestStruct(x, y);
+    kassert(ts->x == x, "Incorrect struct member value");
+    kassert(ts->y == y, "Incorrect struct member value");
+
+    delete ts;
   }
 
   kprintf("malloc() tests passed\n");
