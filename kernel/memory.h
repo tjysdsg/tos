@@ -52,7 +52,10 @@ memory_block_header_t *next_header(memory_block_header_t *header);
 /// Overloading new and delete operators
 
 void *operator new(size_t sz);
+void *operator new[](size_t sz);
+void operator delete(void *ptr, size_t sz) noexcept;
 void operator delete(void *ptr) noexcept;
+void operator delete[](void *ptr) noexcept;
 
 #endif
 

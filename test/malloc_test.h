@@ -10,6 +10,7 @@ class TestStruct {
   int x = 0;
   int y = 0;
   TestStruct(int _x, int _y) : x(_x), y(_y) {}
+  virtual ~TestStruct() = default;
 };
 
 void malloc_test() {
