@@ -8,7 +8,15 @@ class ConsoleDisplay {
   ConsoleDisplay(uint32_t width, uint32_t height, uint32_t depth) : _width(width), _height(height), _depth(depth) {
   }
   virtual ~ConsoleDisplay() = default;
+
+  /**
+   * @brief Put char at current cursor location
+   */
   virtual void putchar(char c) = 0;
+
+  /**
+   * @brief Clear the entire screen and reset cursor location
+   */
   virtual void clear_screen() = 0;
 
  protected:
