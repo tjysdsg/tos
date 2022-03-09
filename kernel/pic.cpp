@@ -3,8 +3,20 @@
 #include "cpuid.h"
 #include "kprintf.h"
 #include "kpanic.h"
+#include "isr.h"
 
 static uint32_t APIC_BASE_ADDR = 0xFEE00000;
+static uint32_t IOAPIC_BASE_ADDR = 0xFEC00000;
+
+#define IOAPIC_REG_VERSION 0x1
+#define IOAPIC_REG_REDTABLE 0x10
+
+typedef struct {
+  uint32_t io_reg_sel;
+  uint32_t pad[3];
+  uint32_t io_win;
+} ioapic_t;
+static volatile ioapic_t *ioapic = nullptr;
 
 uint32_t read_apic_register(uint32_t offset) {
   return *(uint32_t *) (APIC_BASE_ADDR + offset);
@@ -21,6 +33,29 @@ static uint32_t init_x2apic() {
 
   // local x2APIC ID is stored in EBX[31:24] (Intel IA manual Vol. 2A 3-215)
   return edx;
+}
+
+static uint32_t read_ioapic_register(uint32_t reg) {
+  ioapic->io_reg_sel = reg;
+  return ioapic->io_win;
+}
+
+static void write_ioapic_register(uint32_t reg, uint32_t data) {
+  ioapic->io_reg_sel = reg;
+  ioapic->io_win = data;
+}
+
+static void init_io_apic() {
+  // TODO: get IOAPIC_BASE_ADDR from ACPI
+  ioapic = (volatile ioapic_t *) IOAPIC_BASE_ADDR;
+
+  uint32_t max_redirection_entry = (read_ioapic_register(IOAPIC_REG_VERSION) >> 16) & 0xFF;
+
+  // mark all interrupts edge-triggered, active high, disabled, and not routed to any CPUs
+  for (uint32_t i = 0; i <= max_redirection_entry; i++) {
+    write_ioapic_register(IOAPIC_REG_REDTABLE + 2 * i, 0x10000 | (IRQ0 + i));
+    write_ioapic_register(IOAPIC_REG_REDTABLE + 2 * i + 1, 0);
+  }
 }
 
 static void enable_apic() {
@@ -84,6 +119,8 @@ void init_apic() {
   } else {
     kassert(false, "Cannot enable APIC or x2APIC");
   }
+
+  init_io_apic();
 }
 
 void remap_pic() {
@@ -106,4 +143,11 @@ void disable_pic() {
 
 void send_eoi() {
   write_apic_register(APIC_REG_EOI, 0);
+}
+
+void enable_ioapic_irq(uint32_t irq, uint32_t lapic_id) {
+  // mark interrupt edge-triggered, active high, enabled, and routed to the given cpu
+  uint32_t i = irq - IRQ0;
+  write_ioapic_register(IOAPIC_REG_REDTABLE + 2 * i, irq);
+  write_ioapic_register(IOAPIC_REG_REDTABLE + 2 * i + 1, lapic_id);
 }

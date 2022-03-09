@@ -37,6 +37,11 @@ void send_eoi();
 void write_apic_register(uint32_t offset, uint32_t val);
 uint32_t read_apic_register(uint32_t offset);
 
+/**
+ * @brief Make sure to call this to bind an IRQ to a CPU's local APIC
+ */
+void enable_ioapic_irq(uint32_t irq, uint32_t lapic_id);
+
 #ifdef __cplusplus
 }
 #endif
