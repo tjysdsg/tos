@@ -41,6 +41,7 @@ add_library(
         kernel/ps2_keyboard.cpp
         kernel/VBEConsoleDisplay.cpp
         kernel/VGAConsoleDisplay.cpp
+        kernel/cxxabi.cpp
 
         ${KERNEL_TEST_SOURCES}
 )
