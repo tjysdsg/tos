@@ -11,7 +11,8 @@
 
 extern uint8_t _kernel_seg_end; /// see linker.ld
 static uint32_t kernel_free_mem = 0; /// current starting address of free memory
-static heap_t *heap;
+static heap_t *heap = nullptr;
+static bool heap_initialized = false;
 
 /// https://wiki.osdev.org/Exceptions#General_Protection_Fault
 static void general_protection_fault_handler(registers_t *regs) {
@@ -49,6 +50,8 @@ void init_heap() {
   kmemset(heap, 0, sizeof(heap_t));
   heap->start_addr = heap->end_addr = kernel_free_mem;
   kprintf("Heap starts at: 0x%x\n", heap->start_addr);
+
+  heap_initialized = true;
 }
 
 uint32_t kmalloc_page_align(uint32_t size) {
@@ -127,6 +130,7 @@ static memory_block_header_t *merge_blocks_if_possible(memory_block_header_t *pr
 }
 
 void *malloc(uint32_t size) {
+  kassert(heap_initialized, "The heap is not initialized");
   void *ret = nullptr;
   // find an available memory block descriptor
   uint32_t addr = heap->start_addr;
@@ -162,6 +166,7 @@ void *malloc(uint32_t size) {
 }
 
 void free(void *ptr) {
+  kassert(heap_initialized, "The heap is not initialized");
   kassert(ptr, "Cannot free a nullptr");
   memory_block_header_t *header = block_header_from_addr(ptr);
   header->used = 0;
