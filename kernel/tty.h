@@ -15,6 +15,11 @@ void init_tty(multiboot_info_t *mbi);
 
 void putchar(char character);
 
+/**
+ * @brief Display input from keyboard
+ */
+void tty_show_keyboard_input(char character);
+
 void clear_screen();
 
 #ifdef __cplusplus

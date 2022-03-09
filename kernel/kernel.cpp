@@ -9,6 +9,7 @@
 #include "paging.h"
 #include "pit.h"
 #include "kernel_test.h"
+#include "ps2_keyboard.h"
 
 extern "C" void kmain(unsigned long addr) {
   auto *mbi = (multiboot_info_t *) addr;
@@ -24,8 +25,8 @@ extern "C" void kmain(unsigned long addr) {
   remap_pic();
   init_apic();
   init_idt();
-  // set interval timer
-  init_pit_timer(1);
+  init_pit_timer(1); // set interval timer
+  init_ps2_keyboard();
 
   /// 4. initialize memory related components
   init_memory();

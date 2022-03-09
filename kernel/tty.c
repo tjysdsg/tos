@@ -111,3 +111,14 @@ void clear_screen() {
   }
 }
 
+void tty_show_keyboard_input(char c) {
+  switch (c) {
+    // TODO: handle control sequences
+    case '\b':
+    case '\t':
+    default:
+      kprintf("%c", c);
+      break;
+  }
+}
+

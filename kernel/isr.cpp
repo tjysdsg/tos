@@ -26,8 +26,8 @@ void irq_handler(registers_t regs) {
 
   isr_t handler = interrupt_handlers[regs.int_no];
 
-  if (regs.int_no - IRQ0 != 0)
-    kprintf("Receiving IRQ %d, handler at: 0x%x\n", regs.int_no - IRQ0, handler);
+  // if (regs.int_no - IRQ0 != 0)
+  //   kprintf("Receiving IRQ %d, handler at: 0x%x\n", regs.int_no - IRQ0, handler);
 
   if (handler) {
     handler(&regs);

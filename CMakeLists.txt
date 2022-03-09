@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
 project(tos C CXX ASM_NASM)
 
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+
 option(ENABLE_TESTS "Enable tests" ON)
 
 include_directories(thirdparty test .)
@@ -35,6 +38,7 @@ add_library(
         kernel/memory.cpp
         kernel/cpuid.cpp
         kernel/pic.cpp
+        kernel/ps2_keyboard.cpp
 
         ${KERNEL_TEST_SOURCES}
 )
