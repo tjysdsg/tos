@@ -8,18 +8,20 @@ static ConsoleDisplay *console_display = nullptr;
 
 void init_tty(multiboot_info_t *mbi) {
   if (CHECK_FLAG(mbi->flags, 12)) {
-    console_display = new VBEConsoleDisplay(
+    static VBEConsoleDisplay vbe_display(
         (uint8_t *) mbi->framebuffer_addr,
         mbi->framebuffer_width,
         mbi->framebuffer_height,
         mbi->framebuffer_bpp
     );
+    console_display = &vbe_display;
   } else {
-    console_display = new VGAConsoleDisplay(
+    static VGAConsoleDisplay vga_display(
         mbi->framebuffer_width,
         mbi->framebuffer_height,
         mbi->framebuffer_bpp
     );
+    console_display = &vga_display;
   }
 }
 
@@ -33,13 +35,6 @@ void clear_screen() {
 }
 
 void tty_show_keyboard_input(char c) {
-  switch (c) {
-    // TODO: handle control sequences
-    case '\b':
-    case '\t':
-    default:
-      kprintf("%c", c);
-      break;
-  }
+  kprintf("%c", c);
 }
 
