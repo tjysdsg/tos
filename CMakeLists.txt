@@ -31,7 +31,7 @@ add_library(
         kernel/kpanic.cpp
         kernel/port.cpp
         kernel/pit.cpp
-        kernel/tty.c
+        kernel/tty.cpp
         kernel/idt.cpp
         kernel/isr.cpp
         kernel/paging.cpp
@@ -39,6 +39,8 @@ add_library(
         kernel/cpuid.cpp
         kernel/pic.cpp
         kernel/ps2_keyboard.cpp
+        kernel/VBEConsoleDisplay.cpp
+        kernel/VGAConsoleDisplay.cpp
 
         ${KERNEL_TEST_SOURCES}
 )

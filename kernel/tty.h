@@ -2,11 +2,6 @@
 #define TOS_KERNEL_TTY_H_
 #include "multiboot.h"
 
-// attribute of an character
-#define ATTRIBUTE               7
-// video memory address
-#define VIDEO                   0xB8000
-
 #ifdef __cplusplus
 extern "C" {
 #endif
