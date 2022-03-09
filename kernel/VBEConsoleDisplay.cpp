@@ -62,6 +62,14 @@ void VBEConsoleDisplay::putchar(char c) {
         ssfn_dst.x -= _font_width;
       }
       break;
+    case '\t':
+      ssfn_putc(' ');
+      ssfn_putc(' ');
+      ssfn_putc(' ');
+      ssfn_putc(' ');
+      break;
+    case 0x1B: // esc
+      break;
     default:
       ssfn_putc(c);
       break;
@@ -75,7 +83,6 @@ void VBEConsoleDisplay::clear_screen() {
   }
 
   reset_cursor();
-  kprintf("0x%x\n", &ssfn_dst.x);
 }
 
 void VBEConsoleDisplay::reset_cursor() {
