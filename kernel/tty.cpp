@@ -3,9 +3,7 @@
 #include "kpanic.h"
 
 #define SSFN_CONSOLEBITMAP_TRUECOLOR
-// fix errors in ssfn.h using these macros
-#define _STDINT_H
-#include <scalable-font2/ssfn.h>
+#include "ssfn.h"
 
 static uint32_t xpos;
 static uint32_t ypos;
