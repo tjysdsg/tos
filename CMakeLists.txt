@@ -45,7 +45,10 @@ add_library(
 
         ${KERNEL_TEST_SOURCES}
 )
-target_compile_options(kernel PRIVATE -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -O2)
+target_compile_options(
+        kernel
+        PRIVATE -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -O2 -fno-threadsafe-statics
+)
 
 # prepare ssfn font file for linking with the kernel
 set(FONT_O_PATH ${CMAKE_BINARY_DIR}/ssfn.o)

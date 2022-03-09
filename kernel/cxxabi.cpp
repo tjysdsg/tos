@@ -83,8 +83,7 @@ void __cxa_finalize(void *f) {
   }
 }
 
-// TODO: use a lock to implement guards
-
+/* TODO: use a lock to implement guards, and remove the -fno-threadsafe-statics compling flag
 extern "C" int __cxa_guard_acquire(__guard *g) {
   return !*(char *) (g);
 }
@@ -95,3 +94,4 @@ extern "C" void __cxa_guard_release(__guard *g) {
 
 extern "C" void __cxa_guard_abort(__guard *) {
 }
+*/
