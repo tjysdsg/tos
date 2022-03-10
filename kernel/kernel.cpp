@@ -10,33 +10,37 @@
 #include "pit.h"
 #include "kernel_test.h"
 #include "ps2_keyboard.h"
+#include "acpi_driver.h"
 
 extern "C" void kmain(unsigned long addr) {
   auto *mbi = (multiboot_info_t *) addr;
 
-  /// 1. must be the first thing that is called, since even kpanic relies on printing to console
+  /// must be the first thing that is called, since even kpanic relies on printing to console
   init_tty(mbi);
   clear_screen();
 
-  /// 2. check if gdt is initialized before kmain is called, in gdt.asm
+  /// check if gdt is initialized before kmain is called, in gdt.asm
   kassert(gdt_initialized, "GDT is not initialized");
 
-  /// 3. initialize APIC and interrupt handlers
+  /// initialize APIC and interrupt handlers
   remap_pic();
   init_apic();
   init_idt();
   init_pit_timer(1); // set interval timer
   init_ps2_keyboard();
 
-  /// 4. initialize memory related components
+  /// initialize memory related components
   init_memory();
   init_paging();
   init_heap();
 
-  /// 5. Enable interrupts
+  /// ACPI
+  init_acpi();
+
+  /// enable interrupts
   enable_interrupt();
 
-  /// 6. Print multiboot header and multiboot information
+  /// print multiboot header and multiboot information
   kprintf("multiboot header:\n");
   kprintf("  flags = 0x%x\n", multiboot_header.flags);
   kprintf("  header_addr = 0x%x\n", multiboot_header.header_addr);

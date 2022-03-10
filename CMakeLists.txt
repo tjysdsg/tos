@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 option(ENABLE_TESTS "Enable tests" ON)
 
-include_directories(thirdparty test .)
+include_directories(thirdparty thirdparty/acpica/source/include test .)
 
 add_subdirectory(test)
 message(STATUS "Kernel test sources ${KERNEL_TEST_SOURCES}")
@@ -14,6 +14,9 @@ message(STATUS "Kernel test sources ${KERNEL_TEST_SOURCES}")
 if (${ENABLE_TESTS})
     enable_tests()
 endif ()
+
+add_subdirectory(libc)
+add_subdirectory(thirdparty)
 
 add_library(
         boot OBJECT
@@ -42,6 +45,7 @@ add_library(
         kernel/VBEConsoleDisplay.cpp
         kernel/VGAConsoleDisplay.cpp
         kernel/cxxabi.cpp
+        kernel/acpi_driver.cpp
 
         ${KERNEL_TEST_SOURCES}
 )
@@ -49,6 +53,8 @@ target_compile_options(
         kernel
         PRIVATE -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -O2 -fno-threadsafe-statics
 )
+# target_link_libraries(kernel PRIVATE acpica c)
+target_link_libraries(kernel PRIVATE c)
 
 # prepare ssfn font file for linking with the kernel
 set(FONT_O_PATH ${CMAKE_BINARY_DIR}/ssfn.o)
