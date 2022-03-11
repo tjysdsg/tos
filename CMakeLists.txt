@@ -53,7 +53,7 @@ target_compile_options(
         kernel
         PRIVATE -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -O2 -fno-threadsafe-statics
 )
-target_link_libraries(kernel PRIVATE c gcc)
+target_link_libraries(kernel PRIVATE acpica c gcc)
 
 # prepare ssfn font file for linking with the kernel
 set(FONT_O_PATH ${CMAKE_BINARY_DIR}/ssfn.o)
