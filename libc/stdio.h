@@ -1,6 +1,6 @@
 #ifndef TOS_LIBC_STDIO_H
 #define TOS_LIBC_STDIO_H
-#include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,10 +10,7 @@ typedef struct {
   size_t fd;
 } FILE;
 
-int fprintf(FILE *stream, const char *format, ...) {
-  // TODO: implement fprintf
-  return 0;
-}
+int fprintf(FILE *stream, const char *format, ...);
 
 extern FILE *stdin;
 extern FILE *stdout;

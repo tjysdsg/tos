@@ -1,6 +1,7 @@
 add_library(
         c
         string.cpp
+        stdio.cpp
 )
 
 target_compile_options(
