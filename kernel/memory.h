@@ -29,8 +29,6 @@ void init_heap();
  */
 uint32_t kmalloc_page_align(uint32_t size);
 
-void *kmemset(void *ptr, int c, uint32_t n);
-
 void *malloc(uint32_t size);
 void free(void *ptr);
 

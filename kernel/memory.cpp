@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "kpanic.h"
 #include "memory.h"
+#include "string.h"
 #include "kprintf.h"
 #include "isr.h"
 
@@ -47,7 +48,7 @@ void init_heap() {
   // after this, the use of kmalloc_page_align is FORBIDDEN
   // since heap-related data structures is placed right after the kernel
   heap = (heap_t *) kmalloc_page_align(sizeof(heap_t));
-  kmemset(heap, 0, sizeof(heap_t));
+  memset(heap, 0, sizeof(heap_t));
   heap->start_addr = heap->end_addr = kernel_free_mem;
   kprintf("Heap starts at: 0x%x\n", heap->start_addr);
 
@@ -66,15 +67,6 @@ uint32_t kmalloc_page_align(uint32_t size) {
   uint32_t ret = kernel_free_mem;
   kernel_free_mem += size;
   return ret;
-}
-
-void *kmemset(void *ptr, int c, uint32_t n) {
-  auto *p = (uint8_t *) ptr;
-  for (uint32_t i = 0; i < n; ++i) {
-    *p = c;
-    ++p;
-  }
-  return ptr;
 }
 
 /**

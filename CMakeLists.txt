@@ -53,7 +53,7 @@ target_compile_options(
         kernel
         PRIVATE -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -O2 -fno-threadsafe-statics
 )
-target_link_libraries(kernel PRIVATE acpica c gcc)
+target_link_libraries(kernel PUBLIC acpica c gcc)
 
 # prepare ssfn font file for linking with the kernel
 set(FONT_O_PATH ${CMAKE_BINARY_DIR}/ssfn.o)
@@ -76,7 +76,7 @@ add_custom_command(
 
         # link the kernel
         COMMAND echo "Linking $<TARGET_OBJECTS:boot> $<TARGET_FILE:kernel> into a kernel file"
-        COMMAND ${CMAKE_C_COMPILER} -T ${PROJECT_SOURCE_DIR}/kernel/linker.ld -o ${MULTIBOOT_OUTPUT_PATH} -ffreestanding -nostdlib $<TARGET_OBJECTS:boot> $<TARGET_FILE:kernel> ${FONT_O_PATH} -lgcc
+        COMMAND ${CMAKE_C_COMPILER} -T ${PROJECT_SOURCE_DIR}/kernel/linker.ld -o ${MULTIBOOT_OUTPUT_PATH} -ffreestanding -nostdlib $<TARGET_OBJECTS:boot> $<TARGET_FILE:kernel> $<TARGET_FILE:c> ${FONT_O_PATH} -lgcc
         # create grub image
         COMMAND mkdir -p ${ISO_TMP_DIR}/boot/grub
         COMMAND cp ${MULTIBOOT_OUTPUT_PATH} ${ISO_TMP_DIR}/boot/

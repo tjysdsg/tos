@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "string.h"
 #include "paging.h"
 #include "memory.h"
 #include "kpanic.h"
@@ -34,11 +35,11 @@ static void page_fault(registers_t *regs) {
 void init_paging() {
   /// init page directory
   auto *kernel_page_directory = (page_directory_t *) kmalloc_page_align(sizeof(page_directory_t));
-  kmemset(kernel_page_directory, 0, sizeof(page_directory_t));
+  memset(kernel_page_directory, 0, sizeof(page_directory_t));
 
   /// init 1024 page entries and fill their addresses into the corresponding page directory
   auto *kernel_page_tables = (page_table_t *) kmalloc_page_align(sizeof(page_table_t) * 1024);
-  kmemset(kernel_page_tables, 0, sizeof(page_table_t) * 1024);
+  memset(kernel_page_tables, 0, sizeof(page_table_t) * 1024);
 
   /// create an identity map of the entire 4GB physical memory, used by kernel
   uint32_t addr = 0;
