@@ -1,4 +1,4 @@
-// #define ENABLE_ACPI
+#define ENABLE_ACPI
 
 #ifdef ENABLE_ACPI
 #ifdef __cplusplus
@@ -15,6 +15,7 @@ extern "C" {
 #include "kpanic.h"
 #include "memory.h"
 #include "isr.h"
+#include "port.h"
 #include <stdarg.h>
 
 #define CHECK_ACPI_STATUS(status)   \
@@ -166,6 +167,77 @@ ACPI_STATUS AcpiOsCreateLock(ACPI_SPINLOCK*lock) {
 
 void AcpiOsDeleteLock(ACPI_SPINLOCK lock) {
   free((void *) (lock));
+}
+
+ACPI_STATUS AcpiOsReadMemory(ACPI_PHYSICAL_ADDRESS addr, UINT64 *value, UINT32 width) {
+  *value = *(uint64_t *) addr;
+  return AE_OK;
+}
+
+ACPI_STATUS AcpiOsWriteMemory(ACPI_PHYSICAL_ADDRESS addr, UINT64 value, UINT32 width) {
+  *(uint64_t *) addr = value;
+  return AE_OK;
+}
+
+ACPI_STATUS AcpiOsReadPort(ACPI_IO_ADDRESS addr, UINT32 *value, UINT32 width) {
+  switch (width) {
+    case 8:
+      *value = inb(addr);
+      return AE_OK;
+    case 16:
+      *value = inw(addr);
+      return AE_OK;
+    case 32:
+      *value = inl(addr);
+      return AE_OK;
+  }
+
+  return AE_ERROR;
+}
+
+ACPI_STATUS AcpiOsWritePort(ACPI_IO_ADDRESS addr, UINT32 value, UINT32 width) {
+  switch (width) {
+    case 8:
+      outb(addr, value);
+      return AE_OK;
+    case 16:
+      outw(addr, value);
+      return AE_OK;
+    case 32:
+      outl(addr, value);
+      return AE_OK;
+  }
+
+  return AE_ERROR;
+}
+void AcpiOsWaitEventsComplete() {}
+
+ACPI_STATUS AcpiOsReadPciConfiguration(ACPI_PCI_ID *PciId, UINT32 Reg, UINT64 *Value, UINT32 Width) {
+  if (Width != 16) {
+    kprintf("Not implemented for width %d\n", Width);
+    return AE_NOT_IMPLEMENTED;
+  } else {
+    // TODO: *Value = pci::read_reg(PciId->Bus, PciId->Device, PciId->Function, Reg);
+    return AE_OK;
+  }
+}
+
+ACPI_STATUS AcpiOsWritePciConfiguration(ACPI_PCI_ID *PciId, UINT32 Reg, UINT64 Value, UINT32 Width) {
+  if (Width != 16) {
+    kprintf("Not implemented for width %d\n", Width);
+    return AE_NOT_IMPLEMENTED;
+  } else {
+    // TODO: pci::write_reg(PciId->Bus, PciId->Device, PciId->Function, Reg, Value);
+    return AE_OK;
+  }
+  return AE_NOT_IMPLEMENTED;
+}
+
+void ACPI_INTERNAL_VAR_XFACE AcpiOsPrintf(const char *fmt, ...) {
+  va_list va;
+  va_start(va, fmt);
+  kprintf(fmt, va);
+  va_end(va);
 }
 
 struct AcpicaIntHandler {
