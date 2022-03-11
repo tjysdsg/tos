@@ -1,0 +1,4 @@
+#ifndef TOS_LIBC_STDLIB_H
+#define TOS_LIBC_STDLIB_H
+
+#endif //TOS_LIBC_STDLIB_H

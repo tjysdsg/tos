@@ -1,0 +1,4 @@
+#ifndef TOS_LIBC_ATOMIC_H
+#define TOS_LIBC_ATOMIC_H
+
+#endif //TOS_LIBC_ATOMIC_H

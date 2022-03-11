@@ -1,0 +1,4 @@
+#ifndef TOS_LIBC_ERRNO_H
+#define TOS_LIBC_ERRNO_H
+
+#endif //TOS_LIBC_ERRNO_H

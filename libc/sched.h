@@ -1,0 +1,4 @@
+#ifndef TOS_LIBC_SCHED_H
+#define TOS_LIBC_SCHED_H
+
+#endif //TOS_LIBC_SCHED_H

@@ -1,0 +1,4 @@
+#ifndef TOS_LIBC_CTYPE_H
+#define TOS_LIBC_CTYPE_H
+
+#endif //TOS_LIBC_CTYPE_H
