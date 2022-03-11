@@ -27,7 +27,7 @@ add_library(
 )
 
 add_library(
-        kernel OBJECT
+        kernel STATIC
 
         kernel/kernel.cpp
         kernel/kprintf.cpp
@@ -53,8 +53,7 @@ target_compile_options(
         kernel
         PRIVATE -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -O2 -fno-threadsafe-statics
 )
-# target_link_libraries(kernel PRIVATE acpica c)
-target_link_libraries(kernel PRIVATE c)
+target_link_libraries(kernel PRIVATE c gcc)
 
 # prepare ssfn font file for linking with the kernel
 set(FONT_O_PATH ${CMAKE_BINARY_DIR}/ssfn.o)
@@ -76,8 +75,8 @@ add_custom_command(
         OUTPUT ${MULTIBOOT_OUTPUT_PATH} ${ISO_PATH}
 
         # link the kernel
-        COMMAND echo "Linking $<TARGET_OBJECTS:boot> $<TARGET_OBJECTS:kernel> into a kernel file"
-        COMMAND ${CMAKE_C_COMPILER} -T ${PROJECT_SOURCE_DIR}/kernel/linker.ld -o ${MULTIBOOT_OUTPUT_PATH} -ffreestanding -nostdlib $<TARGET_OBJECTS:boot> $<TARGET_OBJECTS:kernel> ${FONT_O_PATH} -lgcc
+        COMMAND echo "Linking $<TARGET_OBJECTS:boot> $<TARGET_FILE:kernel> into a kernel file"
+        COMMAND ${CMAKE_C_COMPILER} -T ${PROJECT_SOURCE_DIR}/kernel/linker.ld -o ${MULTIBOOT_OUTPUT_PATH} -ffreestanding -nostdlib $<TARGET_OBJECTS:boot> $<TARGET_FILE:kernel> ${FONT_O_PATH} -lgcc
         # create grub image
         COMMAND mkdir -p ${ISO_TMP_DIR}/boot/grub
         COMMAND cp ${MULTIBOOT_OUTPUT_PATH} ${ISO_TMP_DIR}/boot/
