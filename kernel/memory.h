@@ -46,6 +46,20 @@ memory_block_header_t *block_header_from_addr(void *ptr);
  */
 memory_block_header_t *next_header(memory_block_header_t *header);
 
+/**
+ * @brief Map a segment of physical memory to virtual memory
+ * @details This will create new virtual page(s) if needed
+ * @param addr Starting physical address
+ * @param size Length of the segment
+ * @return The corresponding address of addr, in virtual memory
+ */
+uint32_t phys2virt(uint32_t addr, uint32_t size);
+
+/**
+ * @brief Find the corresponding physical memory address of a virtual address
+ */
+uint32_t virt2phys(uint32_t addr);
+
 #ifdef __cplusplus
 }
 

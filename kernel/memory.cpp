@@ -210,3 +210,13 @@ void operator delete[](void *ptr) noexcept {
 void operator delete(void *ptr, size_t sz) noexcept {
   free(ptr);
 }
+
+uint32_t phys2virt(uint32_t addr, uint32_t size) {
+  // FIXME: for kernel, the address is the same. But this is not true in userland
+  return addr;
+}
+
+uint32_t virt2phys(uint32_t addr) {
+  // FIXME: for kernel, the address is the same. But this is not true in userland
+  return addr;
+}
