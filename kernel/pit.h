@@ -7,7 +7,18 @@
 extern "C" {
 #endif
 
-void init_pit_timer(uint32_t frequency);
+/**
+ * @brief Init Programmable Interval Timer
+ * @param frequency
+ */
+void init_pit(uint32_t frequency);
+
+/**
+ * @brief Get the PIT's frequency, same as the frequency passed to init_pit
+ */
+uint32_t get_pit_freq();
+
+uint64_t get_pit_tick();
 
 #ifdef __cplusplus
 }

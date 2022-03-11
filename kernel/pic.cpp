@@ -151,3 +151,29 @@ void enable_ioapic_irq(uint32_t irq, uint32_t lapic_id) {
   write_ioapic_register(IOAPIC_REG_REDTABLE + 2 * i, irq);
   write_ioapic_register(IOAPIC_REG_REDTABLE + 2 * i + 1, lapic_id);
 }
+
+static uint32_t tick = 0;
+
+static void apic_timer_callback(registers_t *regs) {
+  tick++;
+  // kprintf("Tick: %d\n", pit_tick);
+}
+
+static void reset_apic_timer(uint32_t reset_value) {
+  write_apic_register(APIC_REG_TICR, reset_value);
+}
+
+static void stop_apic_timer() {
+  // Intel IA manual 10-16 Vol. 3A
+  write_apic_register(APIC_REG_TICR, 0);
+}
+
+// https://wiki.osdev.org/APIC_timer
+void init_apic_timer() {
+  register_interrupt_handler(IRQ0, &apic_timer_callback);
+
+  // setup timer, Intel IA manual 10-16 Vol. 3A
+  write_apic_register(APIC_REG_TDCR, 0xB); // divide timer counts by 1
+  write_apic_register(APIC_REG_TIMER, 0x20000 | IRQ0); // periodic, bind to IRQ0
+  reset_apic_timer(0xFFFFFFFF);
+}

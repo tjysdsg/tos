@@ -6,6 +6,7 @@
 extern "C" {
 #endif
 
+// Intel IA manual Vol. 3A 10-7
 #define APIC_REG_SVR 0xF0 // spurious vector register
 #define APIC_REG_TPR 0x80 // task priority register
 #define APIC_REG_EOI 0xB0 // end of interrupt
@@ -15,12 +16,18 @@ extern "C" {
 #define APIC_REG_TDCR 0x03E0 // timer divide configuration
 #define APIC_REG_TIMER 0x0320 // LVT timer register
 #define APIC_REG_TICR 0x0380 // timer initial count register
+#define APIC_REG_TCCR 0x0390 // timer current count register
 
 /**
  * @brief Init advanced programmable interrupt controller if supported, this will disable the 8259 pic
  * @details Prefer x2APIC over APIC
  */
 void init_apic();
+
+/**
+ * @brief Init APIC timer, and calibrate its frequency
+ */
+void init_apic_timer();
 
 /**
  * @brief Remap 8259 PIC's IRQ 0-15 to 32-47, since 0-31 is reserved for exceptions/faults
@@ -38,7 +45,7 @@ void write_apic_register(uint32_t offset, uint32_t val);
 uint32_t read_apic_register(uint32_t offset);
 
 /**
- * @brief Make sure to call this to bind an IRQ to a CPU's local APIC
+ * @brief Make sure to call this to bind an IRQ triggered by IO APIC to a CPU's local APIC
  */
 void enable_ioapic_irq(uint32_t irq, uint32_t lapic_id);
 
