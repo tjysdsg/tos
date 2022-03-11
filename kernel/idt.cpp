@@ -16,6 +16,8 @@
 idt_entry_t idt_entries[256]{};
 idtr_t idtr{};
 
+static uint32_t get_cpu_flags();
+
 void create_idt_entry(idt_entry_t *entry, uint32_t offset, uint16_t selector, uint8_t flags) {
   entry->offset_low = offset & 0x0000FFFF;
   entry->offset_high = offset >> 16;
@@ -86,4 +88,31 @@ void init_idt() {
 
 void enable_interrupt() {
   asm volatile("sti");
+}
+
+void disable_interrupt() {
+  asm volatile("cli");
+}
+
+bool is_interrupt_enabled() {
+  uint32_t flags = get_cpu_flags();
+  return flags & 0x200;
+}
+
+/// https://github.com/torvalds/linux/blob/master/arch/x86/include/asm/irqflags.h#L20
+static uint32_t get_cpu_flags() {
+  uint32_t flags;
+
+  /*
+   * "=rm" is safe here, because "pop" adjusts the stack before
+   * it evaluates its effective address -- this is part of the
+   * documented behavior of the "pop" instruction.
+   */
+  asm volatile("# __raw_save_flags\n\t"
+               "pushf ; pop %0"
+  : "=rm" (flags)
+  : /* no input */
+  : "memory");
+
+  return flags;
 }

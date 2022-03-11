@@ -28,6 +28,17 @@ struct idtr_t {
 
 void init_idt();
 void enable_interrupt();
+void disable_interrupt();
+bool is_interrupt_enabled();
+
+#define NO_INT_START()                         \
+  bool __tmp_int_enabled = is_interrupt_enabled(); \
+  disable_interrupt();
+
+#define NO_INT_END()                         \
+  if (__tmp_int_enabled) {                       \
+    enable_interrupt();                      \
+  }
 
 extern void flush_idt(uint32_t idtr);
 
