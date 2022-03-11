@@ -13,7 +13,7 @@ class TestStruct {
   virtual ~TestStruct() = default;
 };
 
-void malloc_test() {
+inline void malloc_test() {
   /// 1. basic malloc()ing
   uint32_t size = 100;
   uint8_t *a = (uint8_t *) malloc(size);

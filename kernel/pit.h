@@ -18,7 +18,13 @@ void init_pit(uint32_t frequency);
  */
 uint32_t get_pit_freq();
 
-uint64_t get_pit_tick();
+uint32_t get_pit_tick();
+
+/**
+ * @brief Sleep for a certain time using PIT
+ * @param ms Milliseconds
+ */
+void pit_sleep(uint32_t ms);
 
 #ifdef __cplusplus
 }

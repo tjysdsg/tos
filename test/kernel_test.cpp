@@ -1,7 +1,4 @@
 #include "kernel_test.h"
-#include "interrupt_test.h"
-#include "malloc_test.h"
-#include "pit_test.h"
 
 #ifdef __TOS_ENABLE_KERNEL_TESTS__
 

@@ -4,8 +4,9 @@
 #include "kprintf.h"
 #include "port.h"
 #include "pic.h"
+#include "nop.h"
 
-static uint64_t pit_tick = 0;
+static uint32_t pit_tick = 0;
 static uint32_t pit_freq = 1193180;
 
 static void pit_timer_callback(registers_t *regs) {
@@ -46,4 +47,14 @@ void init_pit(uint32_t frequency) {
 
 uint32_t get_pit_freq() { return pit_freq; }
 
-uint64_t get_pit_tick() { return pit_tick; }
+uint32_t get_pit_tick() { return pit_tick; }
+
+void pit_sleep(uint32_t ms) {
+  uint32_t tick = get_pit_tick();
+  uint32_t target_tick = tick + ms * get_pit_freq() / 1000;
+
+  // kprintf("pit_freq=%d\n", get_pit_freq());
+  // kprintf("tick=%d, target_tick=%d\n", tick, target_tick);
+
+  while (get_pit_tick() < target_tick) { nop(); }
+}
