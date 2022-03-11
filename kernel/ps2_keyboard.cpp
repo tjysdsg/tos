@@ -34,6 +34,6 @@ static void keyboard_interrupt_handler(registers_t *regs) {
 }
 
 void init_ps2_keyboard() {
-  register_interrupt_handler(IRQ1, keyboard_interrupt_handler);
-  enable_ioapic_irq(IRQ1, 0); // let IO APIC pass keyboard interrupts to BSP
+  register_interrupt_handler(APIC_KBD, keyboard_interrupt_handler);
+  enable_ioapic_irq(IOAPIC_KBD, APIC_KBD, 0); // let IO APIC pass keyboard interrupts to BSP
 }

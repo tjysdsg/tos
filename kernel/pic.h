@@ -18,6 +18,14 @@ extern "C" {
 #define APIC_REG_TICR 0x0380 // timer initial count register
 #define APIC_REG_TCCR 0x0390 // timer current count register
 
+#define IOAPIC_KBD 1
+#define IOAPIC_PIT 2 /* PIT is mapped to IOAPIC via IRQ2 instead of IRQ0
+                      https://wiki.osdev.org/HPET#.22Legacy_replacement.22_mapping */
+
+#define APIC_TIMER (IRQ0 + 0)
+#define APIC_KBD (IRQ0 + 1)
+#define APIC_PIT (IRQ0 + 15)
+
 /**
  * @brief Init advanced programmable interrupt controller if supported, this will disable the 8259 pic
  * @details Prefer x2APIC over APIC
@@ -46,8 +54,10 @@ uint32_t read_apic_register(uint32_t offset);
 
 /**
  * @brief Make sure to call this to bind an IRQ triggered by IO APIC to a CPU's local APIC
+ * @param from The original interrupt number IOAPIC got (e.g. 1)
+ * @param to The destination interrupt number passed to CPU's local APIC (e.g. IRQ1)
  */
-void enable_ioapic_irq(uint32_t irq, uint32_t lapic_id);
+void enable_ioapic_irq(uint32_t from, uint32_t to, uint32_t lapic_id);
 
 #ifdef __cplusplus
 }

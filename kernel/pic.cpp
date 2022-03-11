@@ -145,18 +145,20 @@ void send_eoi() {
   write_apic_register(APIC_REG_EOI, 0);
 }
 
-void enable_ioapic_irq(uint32_t irq, uint32_t lapic_id) {
+// doc/ioapic.pdf page 11-12
+void enable_ioapic_irq(uint32_t from, uint32_t to, uint32_t lapic_id) {
+  kassert(from < 24, "IOAPIC supports at most 24 redirection entries");
+
   // mark interrupt edge-triggered, active high, enabled, and routed to the given cpu
-  uint32_t i = irq - IRQ0;
-  write_ioapic_register(IOAPIC_REG_REDTABLE + 2 * i, irq);
-  write_ioapic_register(IOAPIC_REG_REDTABLE + 2 * i + 1, lapic_id);
+  write_ioapic_register(IOAPIC_REG_REDTABLE + 2 * from, to);
+  write_ioapic_register(IOAPIC_REG_REDTABLE + 2 * from + 1, lapic_id << 24);
 }
 
-static uint32_t tick = 0;
+static uint32_t apic_tick = 0;
 
 static void apic_timer_callback(registers_t *regs) {
-  tick++;
-  // kprintf("Tick: %d\n", pit_tick);
+  apic_tick++;
+  // kprintf("APIC timer Tick: %d\n", apic_tick);
 }
 
 static void reset_apic_timer(uint32_t reset_value) {
@@ -170,10 +172,10 @@ static void stop_apic_timer() {
 
 // https://wiki.osdev.org/APIC_timer
 void init_apic_timer() {
-  register_interrupt_handler(IRQ0, &apic_timer_callback);
+  register_interrupt_handler(APIC_TIMER, &apic_timer_callback);
 
   // setup timer, Intel IA manual 10-16 Vol. 3A
   write_apic_register(APIC_REG_TDCR, 0xB); // divide timer counts by 1
-  write_apic_register(APIC_REG_TIMER, 0x20000 | IRQ0); // periodic, bind to IRQ0
+  write_apic_register(APIC_REG_TIMER, 0x20000 | APIC_TIMER); // periodic, bind to corresponding IRQ
   reset_apic_timer(0xFFFFFFFF);
 }

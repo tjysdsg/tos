@@ -3,20 +3,22 @@
 #include "idt.h"
 #include "kprintf.h"
 #include "port.h"
+#include "pic.h"
 
 static uint64_t pit_tick = 0;
 static uint32_t pit_freq = 1193180;
 
 static void pit_timer_callback(registers_t *regs) {
   ++pit_tick;
-  kprintf("PIT tick: %d\n", pit_tick);
+  // kprintf("PIT tick: %d\n", pit_tick);
 }
 
 // https://wiki.osdev.org/Programmable_Interval_Timer
 void init_pit(uint32_t frequency) {
   NO_INT_START();
 
-  register_interrupt_handler(IRQ0, &pit_timer_callback);
+  register_interrupt_handler(APIC_PIT, &pit_timer_callback);
+  enable_ioapic_irq(IOAPIC_PIT, APIC_PIT, 0); // let IO APIC pass PIT interrupts to BSP
 
   // the value we send to the PIT is the divisor of the input clock (1193180 Hz)
   uint16_t divisor = 1193180 / frequency;

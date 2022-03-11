@@ -26,7 +26,10 @@ extern "C" void kmain(unsigned long addr) {
   remap_pic();
   init_apic();
   init_idt();
-  init_pit_timer(1); // set interval timer
+
+  init_pit(1000); // PIT is used to calibrate APIC timer, so init first
+  init_apic_timer();
+
   init_ps2_keyboard();
 
   /// initialize memory related components
