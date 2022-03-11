@@ -21,6 +21,10 @@ void register_interrupt_handler(uint8_t n, isr_t handler) {
   interrupt_handlers[n] = handler;
 }
 
+void unregister_interrupt_handler(uint8_t n) {
+  interrupt_handlers[n] = nullptr;
+}
+
 void irq_handler(registers_t regs) {
   send_eoi();
 
