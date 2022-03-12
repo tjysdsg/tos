@@ -20,6 +20,8 @@ uint32_t get_pit_freq();
 
 uint32_t get_pit_tick();
 
+uint64_t tick2ms(uint32_t tick);
+
 #ifdef __cplusplus
 }
 #endif

@@ -16,6 +16,7 @@ extern "C" {
 #include "memory.h"
 #include "isr.h"
 #include "port.h"
+#include "pit.h"
 #include <stdarg.h>
 
 #define CHECK_ACPI_STATUS(status)   \
@@ -210,6 +211,12 @@ ACPI_STATUS AcpiOsWritePort(ACPI_IO_ADDRESS addr, UINT32 value, UINT32 width) {
 
   return AE_ERROR;
 }
+
+// ACPI don't actually need real system time
+UINT64 AcpiOsGetTimer() {
+  return tick2ms(get_pit_tick()) * 1000000; // milliseconds to nanoseconds
+}
+
 void AcpiOsWaitEventsComplete() {}
 
 ACPI_STATUS AcpiOsReadPciConfiguration(ACPI_PCI_ID *PciId, UINT32 Reg, UINT64 *Value, UINT32 Width) {
@@ -263,6 +270,22 @@ ACPI_STATUS AcpiOsRemoveInterruptHandler(UINT32 int_no, ACPI_OSD_HANDLER hand) {
   acpi_handlers[int_no].hand = nullptr;
   acpi_handlers[int_no].context = nullptr;
   return AE_OK;
+}
+
+ACPI_STATUS AcpiOsSignal(UINT32 fun, void *info) {
+  if (fun == ACPI_SIGNAL_FATAL) {
+    auto *fatal_info = (ACPI_SIGNAL_FATAL_INFO *) info;
+    kprintf("Fatal ACPI signal ! Type : 0x%x, Code : 0x%x, Argument : 0x%x\n",
+            fatal_info->Type,
+            fatal_info->Code,
+            fatal_info->Argument);
+    kpanic("See above");
+  } else if (fun == ACPI_SIGNAL_BREAKPOINT) {
+    kprintf("ACPI Breakpoint : Message : '%s'\n", (const char *) info);
+    return AE_OK;
+  } else {
+    return AE_OK; // ignore
+  }
 }
 #endif
 

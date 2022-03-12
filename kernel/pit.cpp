@@ -4,7 +4,6 @@
 #include "kprintf.h"
 #include "port.h"
 #include "pic.h"
-#include "nop.h"
 
 static uint32_t pit_tick = 0;
 static uint32_t pit_freq = 1193180;
@@ -48,3 +47,7 @@ void init_pit(uint32_t frequency) {
 uint32_t get_pit_freq() { return pit_freq; }
 
 uint32_t get_pit_tick() { return pit_tick; }
+
+uint64_t tick2ms(uint32_t tick) {
+  return ((uint64_t) tick) / pit_freq * 1000;
+}
