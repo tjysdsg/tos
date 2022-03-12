@@ -22,7 +22,7 @@ void init_pit(uint32_t frequency) {
   enable_ioapic_irq(IOAPIC_PIT, APIC_PIT, 0); // let IO APIC pass PIT interrupts to BSP
 
   // the value we send to the PIT is the divisor of the input clock (1193180 Hz)
-  uint16_t divisor = 1193180 / frequency;
+  uint16_t divisor = 1193180 / (uint16_t) frequency;
 
   // 0x43: timer mode/command port
   // 0x36:
@@ -48,13 +48,3 @@ void init_pit(uint32_t frequency) {
 uint32_t get_pit_freq() { return pit_freq; }
 
 uint32_t get_pit_tick() { return pit_tick; }
-
-void pit_sleep(uint32_t ms) {
-  uint32_t tick = get_pit_tick();
-  uint32_t target_tick = tick + ms * get_pit_freq() / 1000;
-
-  // kprintf("pit_freq=%d\n", get_pit_freq());
-  // kprintf("tick=%d, target_tick=%d\n", tick, target_tick);
-
-  while (get_pit_tick() < target_tick) { nop(); }
-}

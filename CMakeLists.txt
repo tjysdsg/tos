@@ -46,6 +46,8 @@ add_library(
         kernel/VGAConsoleDisplay.cpp
         kernel/cxxabi.cpp
         kernel/acpi_driver.cpp
+        kernel/Timer.cpp
+        kernel/PITTimer.cpp
 
         ${KERNEL_TEST_SOURCES}
 )

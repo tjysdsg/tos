@@ -3,6 +3,7 @@
 #include "kernel/idt.h"
 #include "kernel/pit.h"
 #include "kernel/nop.h"
+#include "kernel/PITTimer.h"
 
 #define KERNEL_PIT_FREQUENCY 200
 
@@ -23,8 +24,9 @@ inline void pit_test() {
   }
 
   { // test sleep
+    PITTimer timer;
     uint32_t tick1 = get_pit_tick();
-    pit_sleep(150);
+    timer.sleep(150);
     uint32_t tick2 = get_pit_tick();
     kassert(tick2 == tick1 + 30, "pit_sleep");
   }

@@ -6,6 +6,7 @@
 #include "isr.h"
 #include "pit.h"
 #include "idt.h"
+#include "PITTimer.h"
 
 static uint32_t APIC_BASE_ADDR = 0xFEE00000;
 static uint32_t IOAPIC_BASE_ADDR = 0xFEC00000;
@@ -188,11 +189,15 @@ void init_apic_timer() {
 uint32_t calc_apic_timer_freq(uint32_t calibration_time) {
   kassert(is_interrupt_enabled(), "Cannot calculate APIC timer frequency when interrupt is disabled");
 
+  PITTimer timer;
+  timer.prepare_sleep(calibration_time);
+
   set_apic_timer_count(0xFFFFFFFF);
-  pit_sleep(calibration_time);
+  timer.do_sleep();
+
   // use uint64_t to avoid overflowing
   uint64_t apic_ticks = 0xFFFFFFFF - read_apic_register(APIC_REG_TCCR);
-  stop_apic_timer();
+
   return apic_ticks * 1000 / calibration_time;
 }
 

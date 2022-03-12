@@ -40,6 +40,7 @@ void init_apic_timer();
 /**
  * @brief Calculate APIC timer's frequency
  * @details https://wiki.osdev.org/APIC_timer
+ * @note This will change APIC timer count
  * @param calibration_time in ms
  */
 uint32_t calc_apic_timer_freq(uint32_t calibration_time);
