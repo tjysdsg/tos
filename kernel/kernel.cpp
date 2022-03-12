@@ -40,6 +40,10 @@ extern "C" void kmain(unsigned long addr) {
   init_paging();
   init_heap();
 
+#ifdef __TOS_ENABLE_KERNEL_TESTS__
+  malloc_test(); // NOTE: malloc test must be placed before any malloc() calls
+#endif
+
   // ACPI
   init_acpi();
 
@@ -48,6 +52,11 @@ extern "C" void kmain(unsigned long addr) {
 
   // calibrate APIC timer
   calibrate_apic_timer(100);
+
+#ifdef __TOS_ENABLE_KERNEL_TESTS__
+  interrupt_test();
+  pit_test();
+#endif
 
   // print multiboot header and multiboot information
   /*
@@ -136,8 +145,4 @@ extern "C" void kmain(unsigned long addr) {
       );
   }
   */
-
-  #ifdef __TOS_ENABLE_KERNEL_TESTS__
-  run_kernel_tests();
-  #endif
 }
