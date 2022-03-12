@@ -19,11 +19,12 @@ extern "C" {
 #include "pit.h"
 #include <stdarg.h>
 
-#define CHECK_ACPI_STATUS(status)   \
-do {                                \
-  if (ACPI_FAILURE(status)) {       \
-  kpanic("Cannot initialize ACPI"); \
-  }                                 \
+#define CHECK_ACPI_STATUS(status)           \
+do {                                        \
+  if (ACPI_FAILURE(status)) {               \
+    kprintf("ACPI status: 0x%x\n", status); \
+    kpanic("Cannot initialize ACPI");       \
+  }                                         \
 } while(false)
 
 void init_acpi() {
@@ -50,14 +51,9 @@ void init_acpi() {
 extern "C" {
 
 #ifdef ENABLE_ACPI
-ACPI_STATUS AcpiOsInitialize() {
-  return AE_OK;
-}
+ACPI_STATUS AcpiOsInitialize() { return AE_OK; }
 
-ACPI_STATUS AcpiOsTerminate() {
-  kprintf("ACPI shutdown\n");
-  return AE_OK;
-}
+ACPI_STATUS AcpiOsTerminate() { return AE_OK; }
 
 ACPI_PHYSICAL_ADDRESS AcpiOsGetRootPointer() {
   ACPI_PHYSICAL_ADDRESS ret = 0;
@@ -88,8 +84,12 @@ ACPI_STATUS AcpiOsGetPhysicalAddress(void *LogicalAddress, ACPI_PHYSICAL_ADDRESS
   return AE_OK;
 }
 
-void *AcpiOsAllocate(ACPI_SIZE Size) {
-  return malloc(Size);
+void *AcpiOsAllocate(ACPI_SIZE Size) { return malloc(Size); }
+
+void *AcpiOsAllocateZeroed(ACPI_SIZE Size) {
+  void *ret = malloc(Size);
+  memset(ret, 0, Size);
+  return ret;
 }
 
 void AcpiOsFree(void *Memory) {
