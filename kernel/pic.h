@@ -38,6 +38,19 @@ void init_apic();
 void init_apic_timer();
 
 /**
+ * @brief Calculate APIC timer's frequency
+ * @details https://wiki.osdev.org/APIC_timer
+ * @param calibration_time in ms
+ */
+uint32_t calc_apic_timer_freq(uint32_t calibration_time);
+
+/**
+ * @brief Calibrate APIC timer's frequency, and set its interrupt frequency
+ * @note Must be called after interrupt is enabled
+ */
+void calibrate_apic_timer(uint32_t freq);
+
+/**
  * @brief Remap 8259 PIC's IRQ 0-15 to 32-47, since 0-31 is reserved for exceptions/faults
  */
 void remap_pic();

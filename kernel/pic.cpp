@@ -4,9 +4,12 @@
 #include "kprintf.h"
 #include "kpanic.h"
 #include "isr.h"
+#include "pit.h"
+#include "idt.h"
 
 static uint32_t APIC_BASE_ADDR = 0xFEE00000;
 static uint32_t IOAPIC_BASE_ADDR = 0xFEC00000;
+static uint32_t apic_tick_freq = 0;
 
 #define IOAPIC_REG_VERSION 0x1
 #define IOAPIC_REG_REDTABLE 0x10
@@ -161,8 +164,11 @@ static void apic_timer_callback(registers_t *regs) {
   // kprintf("APIC timer Tick: %d\n", apic_tick);
 }
 
-static void reset_apic_timer(uint32_t reset_value) {
-  write_apic_register(APIC_REG_TICR, reset_value);
+static void set_apic_timer_count(uint32_t count) { write_apic_register(APIC_REG_TICR, count); }
+
+static void reset_apic_timer(uint32_t freq) {
+  kassert(apic_tick_freq, "APIC timer is not calibrated");
+  set_apic_timer_count(apic_tick_freq / freq);
 }
 
 static void stop_apic_timer() {
@@ -177,5 +183,21 @@ void init_apic_timer() {
   // setup timer, Intel IA manual 10-16 Vol. 3A
   write_apic_register(APIC_REG_TDCR, 0xB); // divide timer counts by 1
   write_apic_register(APIC_REG_TIMER, 0x20000 | APIC_TIMER); // periodic, bind to corresponding IRQ
-  reset_apic_timer(0xFFFFFFFF);
+}
+
+uint32_t calc_apic_timer_freq(uint32_t calibration_time) {
+  kassert(is_interrupt_enabled(), "Cannot calculate APIC timer frequency when interrupt is disabled");
+
+  set_apic_timer_count(0xFFFFFFFF);
+  pit_sleep(calibration_time);
+  // use uint64_t to avoid overflowing
+  uint64_t apic_ticks = 0xFFFFFFFF - read_apic_register(APIC_REG_TCCR);
+  stop_apic_timer();
+  return apic_ticks * 1000 / calibration_time;
+}
+
+void calibrate_apic_timer(uint32_t freq) {
+  apic_tick_freq = calc_apic_timer_freq(1000);
+  kprintf("APIC timer tick frequency: %u\n", apic_tick_freq);
+  reset_apic_timer(freq);
 }

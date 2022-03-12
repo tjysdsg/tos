@@ -46,6 +46,9 @@ extern "C" void kmain(unsigned long addr) {
   /// enable interrupts
   enable_interrupt();
 
+  /// calibrate APIC timer
+  calibrate_apic_timer(1000);
+
   /// print multiboot header and multiboot information
   kprintf("multiboot header:\n");
   kprintf("  flags = 0x%x\n", multiboot_header.flags);
