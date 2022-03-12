@@ -212,6 +212,11 @@ ACPI_STATUS AcpiOsWritePort(ACPI_IO_ADDRESS addr, UINT32 value, UINT32 width) {
   return AE_ERROR;
 }
 
+ACPI_STATUS AcpiOsPhysicalTableOverride(ACPI_TABLE_HEADER *exTable, ACPI_PHYSICAL_ADDRESS *addr, UINT32 *length) {
+  *addr = 0;
+  return AE_OK;
+}
+
 // ACPI don't actually need real system time
 UINT64 AcpiOsGetTimer() {
   return tick2ms(get_pit_tick()) * 1000000; // milliseconds to nanoseconds

@@ -77,16 +77,15 @@ add_custom_command(
         OUTPUT ${MULTIBOOT_OUTPUT_PATH} ${ISO_PATH}
 
         # link the kernel
-        COMMAND echo "Linking $<TARGET_OBJECTS:boot> $<TARGET_FILE:kernel> into a kernel file"
-        COMMAND ${CMAKE_C_COMPILER} -T ${PROJECT_SOURCE_DIR}/kernel/linker.ld -o ${MULTIBOOT_OUTPUT_PATH} -ffreestanding -nostdlib $<TARGET_OBJECTS:boot> $<TARGET_FILE:kernel> $<TARGET_FILE:c> $<TARGET_FILE:acpica> ${FONT_O_PATH} -lgcc
+        COMMAND echo "Linking $<TARGET_OBJECTS:boot> $<TARGET_FILE:kernel> $<TARGET_FILE:acpica> into a kernel file"
+        COMMAND ${CMAKE_C_COMPILER} -T ${PROJECT_SOURCE_DIR}/kernel/linker.ld -o ${MULTIBOOT_OUTPUT_PATH} -ffreestanding -nostdlib $<TARGET_OBJECTS:boot> $<TARGET_FILE:kernel> $<TARGET_FILE:acpica> $<TARGET_FILE:c> ${FONT_O_PATH} -lgcc
         # create grub image
         COMMAND mkdir -p ${ISO_TMP_DIR}/boot/grub
         COMMAND cp ${MULTIBOOT_OUTPUT_PATH} ${ISO_TMP_DIR}/boot/
         COMMAND cp ${PROJECT_SOURCE_DIR}/kernel/grub.cfg ${ISO_TMP_DIR}/boot/grub/grub.cfg
         COMMAND grub-mkrescue -o ${ISO_PATH} ${ISO_TMP_DIR}
 
-        DEPENDS boot kernel ${PROJECT_SOURCE_DIR}/kernel/linker.ld ${PROJECT_SOURCE_DIR}/kernel/grub.cfg $<TARGET_OBJECTS:boot> $<TARGET_OBJECTS:kernel> font ${FONT_O_PATH}
-
+        DEPENDS boot kernel c acpica ${PROJECT_SOURCE_DIR}/kernel/linker.ld ${PROJECT_SOURCE_DIR}/kernel/grub.cfg $<TARGET_OBJECTS:boot> font ${FONT_O_PATH}
         COMMAND_EXPAND_LISTS
 )
 add_custom_target(multiboot ALL DEPENDS ${MULTIBOOT_OUTPUT_PATH})

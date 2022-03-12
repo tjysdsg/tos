@@ -2,6 +2,7 @@ add_library(
         c
         string.cpp
         stdio.cpp
+        ctype.cpp
 )
 
 target_compile_options(
