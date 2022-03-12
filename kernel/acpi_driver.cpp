@@ -17,6 +17,7 @@ extern "C" {
 #include "isr.h"
 #include "port.h"
 #include "pit.h"
+#include "PITTimer.h"
 #include <stdarg.h>
 
 #define CHECK_ACPI_STATUS(status)           \
@@ -116,11 +117,13 @@ ACPI_STATUS AcpiOsExecute(ACPI_EXECUTE_TYPE Type, ACPI_OSD_EXEC_CALLBACK Functio
 }
 
 void AcpiOsSleep(UINT64 Milliseconds) {
-  // TODO: sleep(Microseconds * 1000);
+  PITTimer timer;
+  timer.sleep(Milliseconds);
 }
 
 void AcpiOsStall(UINT32 Microseconds) {
-  // TODO: sleep(Microseconds * 1000);
+  PITTimer timer;
+  timer.sleep(Microseconds / 1000);
 }
 
 // TODO: implement semaphore for the following ACPI functions
