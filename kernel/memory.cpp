@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "multiboot.h"
 #include "kpanic.h"
 #include "memory.h"
 #include "string.h"
@@ -32,11 +33,55 @@ static uint32_t align_addr_by_4k(uint32_t addr) {
 }
 
 // must be called before any memory-related operation is performed
-void init_memory() {
+void init_memory(uint32_t mmap_addr, uint32_t mmap_length) {
   kernel_free_mem = (uint32_t) &(_kernel_seg_end);
-  kernel_free_mem += 0x1000; // reserve a 4KB empty space to be safe
 
-  // find kernel free memory starting location, align by 4KB
+  { // find an available memory segment (after the kernel itself) in the memory map as the location of heap
+    multiboot_memory_map_t *mmap = nullptr;
+    uint32_t available_mem_start = 0;
+    uint32_t available_mem_len = 0;
+    for (
+        mmap = (multiboot_memory_map_t *) mmap_addr;
+        (uint32_t) mmap < mmap_addr + mmap_length;
+        mmap = (multiboot_memory_map_t *) ((uint32_t) mmap + mmap->size + sizeof(mmap->size))
+        ) {
+      // 32 bit system so only need uint32_t
+      uint32_t start_addr = mmap->addr;
+      uint32_t length = mmap->len;
+      uint32_t type = mmap->type;
+      uint32_t end_addr = start_addr + length;
+
+      // kprintf(
+      //     "    base_addr = 0x%08x, length = 0x%08x, type = %d\n",
+      //     (uint32_t) (start_addr),
+      //     (uint32_t) (length),
+      //     (uint32_t) type
+      // );
+
+      uint32_t candidate_start = 0;
+      uint32_t candidate_length = 0;
+      if (type != MULTIBOOT_MEMORY_AVAILABLE) continue;
+
+      if (start_addr <= kernel_free_mem && end_addr > kernel_free_mem) {
+        candidate_start = kernel_free_mem;
+        candidate_length = length - (kernel_free_mem - start_addr);
+      } else if (start_addr > kernel_free_mem) {
+        candidate_start = start_addr;
+        candidate_length = length;
+      }
+
+      // prefer using a larger memory segment
+      if (candidate_length > available_mem_len) {
+        kprintf("Found available memory at 0x%x, length 0x%x\n", candidate_start, candidate_length);
+        available_mem_start = candidate_start;
+        available_mem_len = candidate_length;
+      }
+    }
+
+    kassert(available_mem_start && available_mem_len, "Cannot find available memory in multiboot mmap");
+    kernel_free_mem = available_mem_start;
+  }
+
   kernel_free_mem = align_addr_by_4k(kernel_free_mem);
   kprintf("Kernel free memory starts at: 0x%x\n", kernel_free_mem);
 

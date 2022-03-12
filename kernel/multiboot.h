@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 // check if the bit BIT in FLAGS is set
-#define CHECK_FLAG(flags, bit)   ((flags) & (1 << (bit)))
+#define MULTIBOOT_CHECK_FLAG(flags, bit)   ((flags) & (1 << (bit)))
 
 typedef struct {
   /* Must be MULTIBOOT_MAGIC */

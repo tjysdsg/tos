@@ -7,7 +7,7 @@
 static ConsoleDisplay *console_display = nullptr;
 
 void init_tty(multiboot_info_t *mbi) {
-  if (CHECK_FLAG(mbi->flags, 12)) {
+  if (MULTIBOOT_CHECK_FLAG(mbi->flags, 12)) {
     static VBEConsoleDisplay vbe_display(
         (uint8_t *) mbi->framebuffer_addr,
         mbi->framebuffer_width,

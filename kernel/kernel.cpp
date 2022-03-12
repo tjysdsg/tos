@@ -22,6 +22,12 @@ extern "C" void kmain(unsigned long addr) {
   init_tty(mbi);
   clear_screen();
 
+  // init memory map
+  kassert(MULTIBOOT_CHECK_FLAG(mbi->flags, 6), "Multiboot must give us memory map");
+  init_memory(mbi->mmap_addr, mbi->mmap_length);
+
+  // TODO: save all contents in mbi here, since somehow some memory got written later
+
   // check if gdt is initialized before kmain is called, in gdt.asm
   kassert(gdt_initialized, "GDT is not initialized");
 
@@ -36,7 +42,6 @@ extern "C" void kmain(unsigned long addr) {
   init_ps2_keyboard();
 
   // initialize memory related components
-  init_memory();
   init_paging();
   init_heap();
 
@@ -45,7 +50,7 @@ extern "C" void kmain(unsigned long addr) {
 #endif
 
   // ACPI
-  init_acpi();
+  // init_acpi();
 
   // enable interrupts
   enable_interrupt();
@@ -58,8 +63,8 @@ extern "C" void kmain(unsigned long addr) {
   pit_test();
 #endif
 
-  // print multiboot header and multiboot information
   /*
+  // print multiboot header and multiboot information
   kprintf("multiboot header:\n");
   kprintf("  flags = 0x%x\n", multiboot_header.flags);
   kprintf("  header_addr = 0x%x\n", multiboot_header.header_addr);
@@ -77,19 +82,19 @@ extern "C" void kmain(unsigned long addr) {
   kprintf("  flags = 0x%x\n", (unsigned) mbi->flags);
 
   // mem_lower and mem_upper
-  if (CHECK_FLAG(mbi->flags, 0))
+  if (MULTIBOOT_CHECK_FLAG(mbi->flags, 0))
     kprintf("  mem_lower = %uKB, mem_upper = %uKB\n", (unsigned) mbi->mem_lower, (unsigned) mbi->mem_upper);
 
   // boot_device
-  if (CHECK_FLAG(mbi->flags, 1))
+  if (MULTIBOOT_CHECK_FLAG(mbi->flags, 1))
     kprintf("  boot_device = 0x%x\n", (unsigned) mbi->boot_device);
 
   // cmdline
-  if (CHECK_FLAG(mbi->flags, 2))
+  if (MULTIBOOT_CHECK_FLAG(mbi->flags, 2))
     kprintf("  cmdline = %s\n", (char *) mbi->cmdline);
 
   // mods_*
-  if (CHECK_FLAG(mbi->flags, 3)) {
+  if (MULTIBOOT_CHECK_FLAG(mbi->flags, 3)) {
     kprintf("  mods_count = %d, mods_addr = 0x%x\n", (int) mbi->mods_count, (int) mbi->mods_addr);
 
     uint32_t i;
@@ -104,7 +109,7 @@ extern "C" void kmain(unsigned long addr) {
   }
 
   // symbol table?
-  if (CHECK_FLAG(mbi->flags, 4)) {
+  if (MULTIBOOT_CHECK_FLAG(mbi->flags, 4)) {
     multiboot_aout_symbol_table_t *multiboot_aout_sym = &(mbi->u.aout_sym);
 
     kprintf(
@@ -116,7 +121,7 @@ extern "C" void kmain(unsigned long addr) {
   }
 
   // section header table being ELF valid?
-  if (CHECK_FLAG(mbi->flags, 5)) {
+  if (MULTIBOOT_CHECK_FLAG(mbi->flags, 5)) {
     multiboot_elf_section_header_table_t *multiboot_elf_sec = &(mbi->u.elf_sec);
 
     kprintf(
@@ -124,25 +129,6 @@ extern "C" void kmain(unsigned long addr) {
         (unsigned) multiboot_elf_sec->num, (unsigned) multiboot_elf_sec->size,
         (unsigned) multiboot_elf_sec->addr, (unsigned) multiboot_elf_sec->shndx
     );
-  }
-
-  // mmap_*
-  if (CHECK_FLAG(mbi->flags, 6)) {
-    multiboot_memory_map_t *mmap;
-
-    kprintf("  mmap_addr = 0x%x, mmap_length = 0x%x\n", (unsigned) mbi->mmap_addr, (unsigned) mbi->mmap_length);
-    for (mmap = (multiboot_memory_map_t *) mbi->mmap_addr;
-         (unsigned long) mmap < mbi->mmap_addr + mbi->mmap_length;
-         mmap = (multiboot_memory_map_t *) ((unsigned long) mmap + mmap->size + sizeof(mmap->size)))
-      kprintf(
-          "    size = 0x%x, base_addr = 0x%x%08x, length = 0x%x%08x, type = 0x%x\n",
-          (unsigned) mmap->size,
-          (unsigned) (mmap->addr >> 32),
-          (unsigned) (mmap->addr & 0xffffffff),
-          (unsigned) (mmap->len >> 32),
-          (unsigned) (mmap->len & 0xffffffff),
-          (unsigned) mmap->type
-      );
   }
   */
 }

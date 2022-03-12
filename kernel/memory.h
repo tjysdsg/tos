@@ -19,7 +19,7 @@ typedef struct {
   uint32_t end_addr;   /// current end of heap
 } heap_t;
 
-void init_memory();
+void init_memory(uint32_t mmap_addr, uint32_t mmap_length);
 void init_heap();
 
 /**
