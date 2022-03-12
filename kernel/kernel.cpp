@@ -18,14 +18,14 @@
 extern "C" void kmain(unsigned long addr) {
   auto *mbi = (multiboot_info_t *) addr;
 
-  /// must be the first thing that is called, since even kpanic relies on printing to console
+  // must be the first thing that is called, since even kpanic relies on printing to console
   init_tty(mbi);
   clear_screen();
 
-  /// check if gdt is initialized before kmain is called, in gdt.asm
+  // check if gdt is initialized before kmain is called, in gdt.asm
   kassert(gdt_initialized, "GDT is not initialized");
 
-  /// initialize APIC and interrupt handlers
+  // initialize APIC and interrupt handlers
   remap_pic();
   init_apic();
   init_idt();
@@ -35,21 +35,22 @@ extern "C" void kmain(unsigned long addr) {
 
   init_ps2_keyboard();
 
-  /// initialize memory related components
+  // initialize memory related components
   init_memory();
   init_paging();
   init_heap();
 
-  /// ACPI
+  // ACPI
   init_acpi();
 
-  /// enable interrupts
+  // enable interrupts
   enable_interrupt();
 
-  /// calibrate APIC timer
-  calibrate_apic_timer(1000);
+  // calibrate APIC timer
+  calibrate_apic_timer(100);
 
-  /// print multiboot header and multiboot information
+  // print multiboot header and multiboot information
+  /*
   kprintf("multiboot header:\n");
   kprintf("  flags = 0x%x\n", multiboot_header.flags);
   kprintf("  header_addr = 0x%x\n", multiboot_header.header_addr);
@@ -134,6 +135,7 @@ extern "C" void kmain(unsigned long addr) {
           (unsigned) mmap->type
       );
   }
+  */
 
   #ifdef __TOS_ENABLE_KERNEL_TESTS__
   run_kernel_tests();

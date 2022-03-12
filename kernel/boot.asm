@@ -40,13 +40,13 @@ extern load_gdt
 extern kmain                 ; see kernel.cpp
 
 start:
-  cli  ; disable interrupts until IDT is loaded
-  mov  esp, stack_end  ; custom stack
+  cli ; system starts with interrupt disabled
+  mov  esp, stack_end ; custom stack location
 
   call load_gdt
 
-  push    ebx                  ; Load multiboot header location
-  call kmain                   ; call our main() function
+  push ebx     ; load multiboot header location
+  call kmain   ; call our main() function
   jmp $
 
 SECTION .bss
