@@ -4,9 +4,11 @@
 #include "kernel/pit.h"
 #include "kernel/nop.h"
 
-#define KERNEL_PIT_FREQUENCY 200 // overriding the value in kernel.cpp
+#define KERNEL_PIT_FREQUENCY 200
 
 inline void pit_test() {
+  init_pit(KERNEL_PIT_FREQUENCY);
+
   enable_interrupt();
   kassert(is_interrupt_enabled(), "PIT tests require interrupt to be enabled");
 

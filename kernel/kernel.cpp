@@ -15,10 +15,6 @@
 #include "kernel_test.h"
 #endif
 
-#ifndef KERNEL_PIT_FREQUENCY // can be overridden by kernel_test.h
-#define KERNEL_PIT_FREQUENCY 1000
-#endif
-
 extern "C" void kmain(unsigned long addr) {
   auto *mbi = (multiboot_info_t *) addr;
 
@@ -34,7 +30,7 @@ extern "C" void kmain(unsigned long addr) {
   init_apic();
   init_idt();
 
-  init_pit(KERNEL_PIT_FREQUENCY); // PIT is used to calibrate APIC timer, so init first
+  init_pit(1000); // PIT is used to calibrate APIC timer, so init first
   init_apic_timer();
 
   init_ps2_keyboard();
