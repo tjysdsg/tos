@@ -87,12 +87,6 @@ ACPI_STATUS AcpiOsGetPhysicalAddress(void *LogicalAddress, ACPI_PHYSICAL_ADDRESS
 
 void *AcpiOsAllocate(ACPI_SIZE Size) { return malloc(Size); }
 
-void *AcpiOsAllocateZeroed(ACPI_SIZE Size) {
-  void *ret = malloc(Size);
-  memset(ret, 0, Size);
-  return ret;
-}
-
 void AcpiOsFree(void *Memory) {
   free(Memory);
 }
