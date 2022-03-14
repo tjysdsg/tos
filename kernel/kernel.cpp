@@ -26,7 +26,7 @@ extern "C" void kmain(unsigned long addr) {
   kassert(MULTIBOOT_CHECK_FLAG(mbi->flags, 6), "Multiboot must give us memory map");
   init_memory(mbi->mmap_addr, mbi->mmap_length);
 
-  // TODO: save all contents in mbi here, since somehow some memory got written later
+  // TODO: save all contents in mbi here, since multiboot somehow placed things in memory it itself marked as available
 
   // check if gdt is initialized before kmain is called, in gdt.asm
   kassert(gdt_initialized, "GDT is not initialized");
