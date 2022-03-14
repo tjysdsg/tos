@@ -248,12 +248,14 @@ ACPI_STATUS AcpiOsWritePciConfiguration(ACPI_PCI_ID *PciId, UINT32 Reg, UINT64 V
   return AE_NOT_IMPLEMENTED;
 }
 
-void ACPI_INTERNAL_VAR_XFACE AcpiOsPrintf(const char *fmt, ...) {
+void AcpiOsPrintf(const char *fmt, ...) {
   va_list va;
   va_start(va, fmt);
   kprintf(fmt, va);
   va_end(va);
 }
+
+void AcpiOsVprintf(const char *fmt, va_list args) { vprintf(fmt, args); }
 
 struct AcpicaIntHandler {
   ACPI_OSD_HANDLER hand;
