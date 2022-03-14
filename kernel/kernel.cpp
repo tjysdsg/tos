@@ -49,8 +49,8 @@ extern "C" void kmain(unsigned long addr) {
   malloc_test(); // NOTE: malloc test must be placed before any malloc() calls
 #endif
 
-  // ACPI
-  // init_acpi();
+  // ACPI, must be after init_heap, since it uses dynamic memory allocation
+  init_acpi();
 
   // enable interrupts
   enable_interrupt();

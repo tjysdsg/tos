@@ -46,6 +46,8 @@ void init_acpi() {
 
   status = AcpiInitializeObjects(ACPI_FULL_INITIALIZATION);
   CHECK_ACPI_STATUS(status);
+
+  kprintf("Successfully initialized ACPI\n");
 #endif
 }
 
