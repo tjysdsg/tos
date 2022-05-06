@@ -11,6 +11,11 @@
 #define PCI_DEVICE_HEADER_TYPE_PCI_TO_PCI 0x1
 #define PCI_DEVICE_HEADER_TYPE_PCI_TO_CARDBUS 0x2
 
+#define PCI_CONFIG_OFFSET_VENDOR_ID 0
+#define PCI_CONFIG_OFFSET_SUBCLASS 0x9
+#define PCI_CONFIG_OFFSET_CLASS_CODE 0xA
+#define PCI_CONFIG_OFFSET_HEADER_TYPE 0xD
+
 static uint32_t pci_config_read32(uint8_t _bus, uint8_t _device, uint8_t _func, uint8_t offset) {
   uint32_t address;
   uint32_t bus = (uint32_t) _bus;
@@ -42,7 +47,11 @@ static uint8_t pci_config_read8(uint8_t bus, uint8_t device, uint8_t func, uint8
 }
 
 static uint16_t pci_vendor_id(uint8_t bus, uint8_t device, uint16_t func) {
-  return pci_config_read16(bus, device, func, 0);
+  return pci_config_read16(bus, device, func, PCI_CONFIG_OFFSET_VENDOR_ID);
+}
+
+static uint8_t pci_class_code(uint8_t bus, uint8_t device, uint16_t func) {
+  return pci_config_read8(bus, device, func, PCI_CONFIG_OFFSET_CLASS_CODE);
 }
 
 // TODO
@@ -50,7 +59,7 @@ static void pci_init_device(uint8_t bus, uint8_t device, uint8_t function) {
 }
 
 static uint8_t pci_header_type(uint16_t bus, uint16_t slot, uint16_t func) {
-  return pci_config_read8(bus, slot, func, 0xD);
+  return pci_config_read8(bus, slot, func, PCI_CONFIG_OFFSET_HEADER_TYPE);
 }
 
 void pci_scan() {
@@ -68,7 +77,12 @@ void pci_scan() {
       for (function = 0; function < n_functions; function++) {
         if (pci_vendor_id(bus, device, function) != PCI_INVALID_VENDOR_ID) {
           pci_init_device(bus, device, function);
-          kprintf("PCI: vendor_id=%d, device=%d, function=%d\n", vendor_id, device, function);
+          uint8_t class_code = pci_class_code(bus, device, function);
+          kprintf("PCI: vendor_id=0x%x, device=0x%x, function=0x%x, class=0x%x\n",
+                  vendor_id,
+                  device,
+                  function,
+                  class_code);
         }
       }
     }
