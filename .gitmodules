@@ -3,4 +3,4 @@
 	url = https://gitlab.com/bztsrc/scalable-font2.git
 [submodule "thirdparty/acpica"]
 	path = thirdparty/acpica
-	url = git@github.com:acpica/acpica.git
+	url = git@github.com:tjysdsg/acpica.git
