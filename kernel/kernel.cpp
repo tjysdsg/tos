@@ -10,6 +10,7 @@
 #include "pit.h"
 #include "ps2_keyboard.h"
 #include "acpi_driver.h"
+#include "pci.h"
 
 #ifdef __TOS_ENABLE_KERNEL_TESTS__
 #include "kernel_test.h"
@@ -51,6 +52,8 @@ extern "C" void kmain(unsigned long addr) {
 
   // ACPI, must be after init_heap, since it uses dynamic memory allocation
   init_acpi();
+
+  init_pci();
 
   // enable interrupts
   enable_interrupt();

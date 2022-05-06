@@ -48,6 +48,7 @@ add_library(
         kernel/acpi_driver.cpp
         kernel/Timer.cpp
         kernel/PITTimer.cpp
+        kernel/pci.cpp
 
         ${KERNEL_TEST_SOURCES}
 )
