@@ -42,6 +42,7 @@ extern kmain                 ; see kernel.cpp
 start:
   cli ; system starts with interrupt disabled
   mov  esp, stack_end ; custom stack location
+  mov  ebp, stack_end
 
   call load_gdt
 

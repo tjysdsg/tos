@@ -13,7 +13,16 @@
 
 extern uint8_t _kernel_seg_end; /// see linker.ld
 
+/*
+ * For kernel:
+ *                                       mem_start free_mem(4k align)       mem_end
+ *                                       ^          ^                         ^
+ * | stack (see linker.ld and boot.asm)  |  used    |       available         |
+ */
 static uint32_t kernel_free_mem = 0; /// current starting address of free memory
+static uint32_t kernel_mem_start = 0;
+static uint32_t kernel_mem_end = 0;
+
 static heap_t *heap = nullptr;
 static bool heap_initialized = false;
 
@@ -62,12 +71,14 @@ void init_memory(uint32_t mmap_addr, uint32_t mmap_length) {
       multiboot_mmaps[i].len = length;
       multiboot_mmaps[i].type = type;
 
+      /*
       kprintf(
           "    base_addr = 0x%08x, length = 0x%08x, type = %d\n",
           (uint32_t) (start_addr),
           (uint32_t) (length),
           (uint32_t) type
       );
+      */
 
       uint32_t candidate_start = 0;
       uint32_t candidate_length = 0;
@@ -93,6 +104,8 @@ void init_memory(uint32_t mmap_addr, uint32_t mmap_length) {
 
     kassert(available_mem_start && available_mem_len, "Cannot find available memory in multiboot mmap");
     kernel_free_mem = available_mem_start;
+    kernel_mem_start = available_mem_start;
+    kernel_mem_end = available_mem_start + available_mem_len;
   }
 
   kernel_free_mem = align_addr_by_4k(kernel_free_mem);
