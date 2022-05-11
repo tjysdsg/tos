@@ -12,9 +12,12 @@
 #define MIN_MEMORY_SPLIT_THRESHOLD 4
 
 extern uint8_t _kernel_seg_end; /// see linker.ld
+
 static uint32_t kernel_free_mem = 0; /// current starting address of free memory
 static heap_t *heap = nullptr;
 static bool heap_initialized = false;
+
+multiboot_memory_map_t multiboot_mmaps[128];
 
 /// https://wiki.osdev.org/Exceptions#General_Protection_Fault
 static void general_protection_fault_handler(registers_t *regs) {
@@ -37,9 +40,12 @@ void init_memory(uint32_t mmap_addr, uint32_t mmap_length) {
   kernel_free_mem = (uint32_t) &(_kernel_seg_end);
 
   { // find an available memory segment (after the kernel itself) in the memory map as the location of heap
+    memset(multiboot_mmaps, 0, sizeof(multiboot_mmaps));
+
     multiboot_memory_map_t *mmap = nullptr;
     uint32_t available_mem_start = 0;
     uint32_t available_mem_len = 0;
+    int i = 0;
     for (
         mmap = (multiboot_memory_map_t *) mmap_addr;
         (uint32_t) mmap < mmap_addr + mmap_length;
@@ -51,12 +57,17 @@ void init_memory(uint32_t mmap_addr, uint32_t mmap_length) {
       uint32_t type = mmap->type;
       uint32_t end_addr = start_addr + length;
 
-      // kprintf(
-      //     "    base_addr = 0x%08x, length = 0x%08x, type = %d\n",
-      //     (uint32_t) (start_addr),
-      //     (uint32_t) (length),
-      //     (uint32_t) type
-      // );
+      // save the memory maps for easier access in the future
+      multiboot_mmaps[i].addr = start_addr;
+      multiboot_mmaps[i].len = length;
+      multiboot_mmaps[i].type = type;
+
+      kprintf(
+          "    base_addr = 0x%08x, length = 0x%08x, type = %d\n",
+          (uint32_t) (start_addr),
+          (uint32_t) (length),
+          (uint32_t) type
+      );
 
       uint32_t candidate_start = 0;
       uint32_t candidate_length = 0;
@@ -76,6 +87,8 @@ void init_memory(uint32_t mmap_addr, uint32_t mmap_length) {
         available_mem_start = candidate_start;
         available_mem_len = candidate_length;
       }
+
+      ++i;
     }
 
     kassert(available_mem_start && available_mem_len, "Cannot find available memory in multiboot mmap");
