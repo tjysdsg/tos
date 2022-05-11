@@ -1,6 +1,8 @@
 #ifndef TOS_KERNEL_PAGING_H
 #define TOS_KERNEL_PAGING_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,6 +40,8 @@ typedef struct {
 typedef struct {
   page_directory_entry_t entries[1024];
 } page_directory_t;
+
+extern page_directory_t *kernel_page_directory;
 
 void init_paging();
 

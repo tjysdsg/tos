@@ -1,10 +1,11 @@
-#include <stdint.h>
 #include "string.h"
 #include "paging.h"
 #include "memory.h"
 #include "kpanic.h"
 #include "kprintf.h"
 #include "isr.h"
+
+page_directory_t *kernel_page_directory = nullptr;
 
 extern "C" void load_page_directory(uint32_t page_directory);
 extern "C" void enable_paging();
@@ -34,7 +35,7 @@ static void page_fault(registers_t *regs) {
 
 void init_paging() {
   /// init page directory
-  auto *kernel_page_directory = (page_directory_t *) kmalloc_page_align(sizeof(page_directory_t));
+  kernel_page_directory = (page_directory_t *) kmalloc_page_align(sizeof(page_directory_t));
   memset(kernel_page_directory, 0, sizeof(page_directory_t));
 
   /// init 1024 page entries and fill their addresses into the corresponding page directory
@@ -67,4 +68,3 @@ void init_paging() {
   load_page_directory((uint32_t) kernel_page_directory);
   enable_paging();
 }
-
